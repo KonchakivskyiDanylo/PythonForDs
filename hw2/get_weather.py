@@ -2,10 +2,18 @@ import datetime as dt
 import json
 import requests
 from flask import Flask, jsonify, request
-from tokens import API_TOKEN, VISUAL_CROSSING_API_KEY
 
-API_TOKEN = API_TOKEN
-VISUAL_CROSSING_API_KEY = VISUAL_CROSSING_API_KEY
+#load APIs
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_TOKEN = os.getenv("API_TOKEN")
+VISUAL_CROSSING_API_KEY = os.getenv("VISUAL_CROSSING_API_KEY")
+
+if not API_TOKEN or not VISUAL_CROSSING_API_KEY:
+    raise ValueError("Missing API keys. Please set them in the .env file.")
 
 app = Flask(__name__)
 

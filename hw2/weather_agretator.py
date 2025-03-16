@@ -1,6 +1,12 @@
 import requests
 import json
 import datetime
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_TOKEN = os.getenv("API_TOKEN")
 
 
 def get_weather_for_all_oblasts():
@@ -13,8 +19,6 @@ def get_weather_for_all_oblasts():
     ]
 
     url = "http://127.0.0.1:5000/weather"
-
-    from tokens import API_TOKEN
 
     all_weather_data = {}
 
