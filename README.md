@@ -1,14 +1,14 @@
 # War Event Prediction Project
 
-### Team 2:
+## **Team Members**
 
-- Konchakivskyi Danylo
-- Lotariev Artem
-- Beha Serhiy
-- Kovalchuk Yurii
-- Latyshenko Yaroslav
+- *Konchakivskyi Danylo*
+- *Lotariev Artem*
+- *Beha Serhiy*
+- *Kovalchuk Yurii*
+- *Latyshenko Yaroslav*
 
-## Overview
+## **Overview**
 
 This is a Python-based SaaS (Software as a Service) project designed to predict war events in Ukrainian regions using
 multiple data sources. The project aims to forecast three primary event types:
@@ -25,6 +25,24 @@ The system combines data from various sources including:
 - Weather forecasts https://www.visualcrossing.com/weather-api
 - Regional alert systems https://devs.alerts.in.ua/
 
+## 🔒 **CRITICAL SECURITY NOTICE: `.env` FILE PROTECTION**
+
+**IMPORTANT: Your `.env` file contains sensitive credentials and MUST be kept ABSOLUTELY CONFIDENTIAL**
+
+**Mandatory Security Practices**:
+
+1. **Never** commit `.env` to version control
+2. Use `.gitignore` to block `.env` files
+3. Generate unique tokens for each environment
+4. Rotate API keys periodically
+
+```bash
+# Add to .gitignore
+.env
+*.env
+!.env.example
+```
+
 ## Project Structure
 
 The project consists of several key modules:
@@ -35,13 +53,13 @@ The project consists of several key modules:
 
 2 and 3 will be implemented soon
 
-## Prerequisites
+## **Prerequisites**
 
-### System Requirements
+### **System Requirements**
 
-- Python 3.8+
-- MongoDB
-- Git
+- **Python 3.8+**
+- **MongoDB**
+- **Git**
 
 ### Installation Steps
 
