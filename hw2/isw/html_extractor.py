@@ -57,7 +57,7 @@ def process_documents(mongo, database, input_collection, output_collection):
 
 def main():
     parser = argparse.ArgumentParser(description="ISW HTML to Text Extractor")
-    parser.add_argument("--mongo", default="mongodb://localhost:27017/",
+    parser.add_argument("--mongo-uri", default="mongodb://localhost:27017/",
                         type=validate_mongodb,
                         help="MongoDB connection string (default: localhost)")
     parser.add_argument("--database", default="PythonForDs",

@@ -1,6 +1,4 @@
 import requests
-import json
-import datetime
 import os
 from dotenv import load_dotenv
 
@@ -34,14 +32,6 @@ def get_weather_for_all_oblasts():
                 print(f"Error for {oblast}: {response.status_code} - {response.text}")
         except Exception as e:
             print(f"Error for {oblast}: {str(e)}")
-
-    current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    filename = f"weather_data_{current_time}.json"
-
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(all_weather_data, f, ensure_ascii=False, indent=2)
-
-    print(f"\nData is saved in {filename}")
     return all_weather_data
 
 

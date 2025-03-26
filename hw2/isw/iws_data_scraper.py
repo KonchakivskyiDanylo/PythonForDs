@@ -66,7 +66,7 @@ def main():
     parser = argparse.ArgumentParser(description="ISW Report Scraper")
     parser.add_argument("start_date", type=validate_date, help="Start date (YYYY-MM-DD)")
     parser.add_argument("end_date", type=validate_date, help="End date (YYYY-MM-DD)")
-    parser.add_argument("--mongo", default="mongodb://localhost:27017/",
+    parser.add_argument("--mongo-uri", default="mongodb://localhost:27017/",
                         help="MongoDB connection string (default: localhost)")
     parser.add_argument("--database", default="PythonForDs",
                         help="MongoDB database name (default: PythonForDs)")

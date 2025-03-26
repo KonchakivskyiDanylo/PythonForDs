@@ -85,22 +85,5 @@ def alerts_endpoint():
     return jsonify(result)
 
 
-@app.route("/alerts/all", methods=["POST"])
-def all_alerts_endpoint():
-    token = request.args.get("token")
-
-    if token != API_TOKEN:
-        raise InvalidUsage("Invalid API token", status_code=403)
-
-    alerts_data = get_alerts_data()
-
-    result = {
-        "request_time": dt.datetime.now(dt.timezone.utc).isoformat() + "Z",
-        "data": alerts_data
-    }
-
-    return jsonify(result)
-
-
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

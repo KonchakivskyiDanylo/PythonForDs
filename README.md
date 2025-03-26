@@ -33,7 +33,7 @@ The project consists of several key modules:
 2. **Forecasting Module**: Prepares and executes prediction models
 3. **Frontend UI**: Interaction interface for the backend
 
-2 and 3 will be implemented soon!
+2 and 3 will be implemented soon
 
 ## Prerequisites
 
@@ -98,14 +98,14 @@ You can scrape ISW reports for a specific date range from the terminal:
 python iws_data_scraper.py 2022-02-24 2025-03-01
 
 # Optional MongoDB customization
-python iws_data_scraper.py 2022-02-24 2025-03-01 --mongo mongodb://localhost:27017/ --database PythonForDs --collection isw_html
+python iws_data_scraper.py 2022-02-24 2025-03-01 --mongo-uri mongodb://localhost:27017/ --database PythonForDs --collection isw_html
 ```
 
 **Arguments**:
 
 - First argument: Start date (YYYY-MM-DD)
 - Second argument: End date (YYYY-MM-DD)
-- `--mongo`: Custom MongoDB connection string (optional)
+- `--mongo-uri`: Custom MongoDB connection string (optional)
 - `--database`: MongoDB database name (optional)
 - `--collection`: MongoDB collection name (optional)
 
@@ -124,7 +124,7 @@ python iws_data_scraper.py today today
 
 **Arguments**:
 
-- `--mongo`: Custom MongoDB connection string (optional)
+- `--mongo-uri`: Custom MongoDB connection string (optional)
 - `--database`: MongoDB database name (optional)
 - `--input-collection`: MongoDB input collection name (optional)
 - `--output-collection`: MongoDB output collection name (optional)
@@ -136,7 +136,7 @@ python iws_data_scraper.py today today
 python html_extractor.py
 
 # Optional MongoDB customization
-python html_extractor.py --mongo mongodb://localhost:27017/ --database PythonForDs --input-collection isw_html --output-collection isw_report
+python html_extractor.py --mongo-uri mongodb://localhost:27017/ --database PythonForDs --input-collection isw_html --output-collection isw_report
 ```
 
 ### 3. Weather Service API (`get_weather.py`)
@@ -163,10 +163,10 @@ python html_extractor.py --mongo mongodb://localhost:27017/ --database PythonFor
 
 ```bash
 # Run the Flask weather service
-flask run
+python get_weather.py
 ```
 
-Although you can just run flask, it is better to use WSGI server instead
+Although you can just run python script, it is better to use WSGI server instead
 
 **API Endpoint**:
 
@@ -183,24 +183,52 @@ Although you can just run flask, it is better to use WSGI server instead
   ```
 
 I reccommend you to use postman https://www.postman.com/downloads/
+
 To use it create postman collection -> add_request and follow text above and click send to get response
+
 
 ### 4. Weather Forecast Aggregator (`weather_forecast.py`)
 
 - Retrieves weather data for Ukrainian oblasts
-- Saves forecast data to JSON files with timestamped filenames
+- Return forecast data 
 
 **Usage**:
 
 ```bash
 python weather_forecast.py
 ```
+But make sure get_weather.py is running right now
 
-**Key Features**:
+### 5. Alerts (`alerts.py`)
 
-- Covers 24 Ukrainian oblasts
-- Automatically generates JSON files with weather data
-- Prints progress and file save location
+- Flask-based service for getting active alerts in Ukrainian oblasts
+- Uses devs alerts in ua and their python library 
+
+- Requires `.env` file with `API_TOKEN` and `ALERTS_API_TOKEN`
+
+**Usage**:
+
+```bash
+# Run the Flask weather service
+python alerts.py
+```
+
+Although you can just run python script, it is better to use WSGI server instead
+
+**API Endpoint**:
+
+- Method: POST
+- URL: http://127.0.0.1:5001
+- Endpoint: `/alerts`
+- Required JSON payload:
+  ```json
+  {
+    "token": "your_api_token",
+    "requester_name": "Your Name"
+  }
+  ```
+ You can use it in postman with all the info in the end of 3rd point
+
 
 ## Data Collection Workflow
 
