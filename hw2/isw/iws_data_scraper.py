@@ -63,18 +63,21 @@ def scrape_data(start_date, end_date, collection):
 
 
 def main():
+    today = datetime.now().date()
     parser = argparse.ArgumentParser(description="ISW Report Scraper")
-    parser.add_argument("start_date", type=validate_date, help="Start date (YYYY-MM-DD)")
-    parser.add_argument("end_date", type=validate_date, help="End date (YYYY-MM-DD)")
+    parser.add_argument("start_date", nargs='?', type=validate_date,
+                        default=today,
+                        help="Start date (YYYY-MM-DD), defaults to today")
+    parser.add_argument("end_date", nargs='?', type=validate_date,
+                        default=today,
+                        help="End date (YYYY-MM-DD), defaults to today")
     parser.add_argument("--mongo-uri", default="mongodb://localhost:27017/",
                         help="MongoDB connection string (default: localhost)")
     parser.add_argument("--database", default="PythonForDs",
                         help="MongoDB database name (default: PythonForDs)")
     parser.add_argument("--collection", default="isw_html",
                         help="MongoDB collection name (default: isw_html)")
-
     args = parser.parse_args()
-
     if args.start_date > args.end_date:
         print("Start date must be before or equal to end date.")
         return

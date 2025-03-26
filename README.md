@@ -182,27 +182,27 @@ Although you can just run python script, it is better to use WSGI server instead
   }
   ```
 
-I reccommend you to use postman https://www.postman.com/downloads/
+Recommend you to use postman https://www.postman.com/downloads/
 
-To use it create postman collection -> add_request and follow text above and click send to get response
-
+To use it, create postman collection -> add_request -> use text above and click send to get response
 
 ### 4. Weather Forecast Aggregator (`weather_forecast.py`)
 
 - Retrieves weather data for Ukrainian oblasts
-- Return forecast data 
+- Return forecast data for every Ukrainian oblast for the next 24 hours
 
 **Usage**:
 
 ```bash
 python weather_forecast.py
 ```
+
 But make sure get_weather.py is running right now
 
 ### 5. Alerts (`alerts.py`)
 
-- Flask-based service for getting active alerts in Ukrainian oblasts
-- Uses devs alerts in ua and their python library 
+- Flask-based service for getting active alerts in Ukraine
+- Uses devs_alerts_in_ua and their python library
 
 - Requires `.env` file with `API_TOKEN` and `ALERTS_API_TOKEN`
 
@@ -227,8 +227,8 @@ Although you can just run python script, it is better to use WSGI server instead
     "requester_name": "Your Name"
   }
   ```
- You can use it in postman with all the info in the end of 3rd point
 
+You can use it in postman with all the info in the end of 3rd paragraph
 
 ## Data Collection Workflow
 
@@ -237,17 +237,8 @@ Although you can just run python script, it is better to use WSGI server instead
 3. Collect weather forecasts
 4. Retrieve active alerts
 
-## Contributions
-
-Please read `CONTRIBUTING.md` (to be created) for details on our code of conduct and the process for submitting pull
-requests.
-
-## License
-
-This project is licensed under the MIT License - see the `LICENSE` file for details.
-
 ## Acknowledgments
 
 - Institute for the Study of War
 - Visual Crossing Weather API
-- Ukrainian Alerts API
+- Devs alerts in UA API
