@@ -29,7 +29,7 @@ def scrape_report(date, collection):
 
         if response.status_code == 200:
             document = {
-                "date": date,
+                "date": datetime.combine(date, datetime.min.time()),
                 "url": url,
                 "html_content": response.text,
             }
@@ -64,9 +64,10 @@ def scrape_data(start_date, end_date, collection):
 
 def main():
     today = datetime.now().date()
+    start = validate_date("2025-03-01")
     parser = argparse.ArgumentParser(description="ISW Report Scraper")
     parser.add_argument("start_date", nargs='?', type=validate_date,
-                        default=today,
+                        default=start,
                         help="Start date (YYYY-MM-DD), defaults to today")
     parser.add_argument("end_date", nargs='?', type=validate_date,
                         default=today,
