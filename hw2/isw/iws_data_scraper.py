@@ -72,7 +72,7 @@ def main():
     parser.add_argument("end_date", nargs='?', type=validate_date,
                         default=today,
                         help="End date (YYYY-MM-DD), defaults to today")
-    parser.add_argument("--mongo-uri", default="mongodb://localhost:27017/",
+    parser.add_argument("--mongo", default="mongodb://localhost:27017/",
                         help="MongoDB connection string (default: localhost)")
     parser.add_argument("--database", default="PythonForDs",
                         help="MongoDB database name (default: PythonForDs)")
@@ -84,7 +84,7 @@ def main():
         return
 
     try:
-        client = pymongo.MongoClient(args.mongo_uri)
+        client = pymongo.MongoClient(args.mongo)
         db = client[args.database]
         collection = db[args.collection]
     except Exception as e:

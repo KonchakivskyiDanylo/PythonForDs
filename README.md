@@ -116,14 +116,14 @@ You can scrape ISW reports for a specific date range from the terminal:
 python iws_data_scraper.py 2022-02-24 2025-03-01
 
 # Optional MongoDB customization
-python iws_data_scraper.py 2022-02-24 2025-03-01 --mongo-uri mongodb://localhost:27017/ --database PythonForDs --collection isw_html
+python iws_data_scraper.py 2022-02-24 2025-03-01 --mongo mongodb://localhost:27017/ --database PythonForDs --collection isw_html
 ```
 
 **Arguments**:
 
 - First argument: Start date (YYYY-MM-DD)
 - Second argument: End date (YYYY-MM-DD)
-- `--mongo-uri`: Custom MongoDB connection string (optional)
+- `--mongo`: Custom MongoDB connection string (optional)
 - `--database`: MongoDB database name (optional)
 - `--collection`: MongoDB collection name (optional)
 
@@ -142,7 +142,7 @@ python iws_data_scraper.py
 
 **Arguments**:
 
-- `--mongo-uri`: Custom MongoDB connection string (optional)
+- `--mongo`: Custom MongoDB connection string (optional)
 - `--database`: MongoDB database name (optional)
 - `--input-collection`: MongoDB input collection name (optional)
 - `--output-collection`: MongoDB output collection name (optional)
@@ -154,7 +154,7 @@ python iws_data_scraper.py
 python html_extractor.py
 
 # Optional MongoDB customization
-python html_extractor.py --mongo-uri mongodb://localhost:27017/ --database PythonForDs --input-collection isw_html --output-collection isw_report
+python html_extractor.py --mongo mongodb://localhost:27017/ --database PythonForDs --input-collection isw_html --output-collection isw_report
 ```
 
 ### 3. Weather Service API (`get_weather.py`)
