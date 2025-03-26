@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 def validate_date(date_string):
     try:
-        return datetime.strptime(date_string, "%Y-%m-%d")
+        return datetime.strptime(date_string, "%Y-%m-%d").date()
     except ValueError:
         raise argparse.ArgumentTypeError("Invalid date format. Use YYYY-MM-DD")
 

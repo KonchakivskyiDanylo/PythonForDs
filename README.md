@@ -110,11 +110,11 @@ python iws_data_scraper.py 2022-02-24 2025-03-01 --mongo-uri mongodb://localhost
 - `--collection`: MongoDB collection name (optional)
 
 ```bash
-# Run this script to get up-to-date data:
-python iws_data_scraper.py 2022-02-24 today
+# Run this script to get from the given data until today:
+python iws_data_scraper.py 2022-02-24 
 
 # To get today's report run this:
-python iws_data_scraper.py today today
+python iws_data_scraper.py 
 ```
 
 ### 2. HTML Text Extractor (`html_extractor.py`)
@@ -242,3 +242,4 @@ You can use it in postman with all the info in the end of 3rd paragraph
 - Institute for the Study of War
 - Visual Crossing Weather API
 - Devs alerts in UA API
+- Andrew Kurochkin
