@@ -72,7 +72,7 @@ pip install -r requirements.txt
 ```
 API_TOKEN=your_generated_api_token # can be generated on different websites 
 VISUAL_CROSSING_API_KEY=your_visual_crossing_api_key # can be found here https://www.visualcrossing.com/weather-api
-ALERTS_API_TOKEN=your_alerts_api_token # you can apply for API on this website( we get during an hour) https://devs.alerts.in.ua/
+ALERTS_API_TOKEN=your_alerts_api_token # you can apply for API on this website( we got during an hour) https://devs.alerts.in.ua/
 ```
 
 2. MongoDB Setup
@@ -82,36 +82,113 @@ ALERTS_API_TOKEN=your_alerts_api_token # you can apply for API on this website( 
 - Database name: `PythonForDs`
 - Collections: `isw_html`, `isw_report`
 
-Database and collections names can be changed if you want
+Database and collections names can be changed if you want.
 
 ## Scripts and Their Purposes
 
 ### 1. ISW Data Scraper (`iws_data_scraper.py`)
 
-- Scrapes daily reports from the Institute for the Study of War
+- Scrapes daily reports from the Institute for the Study of War for a given period of time
 - Saves HTML content to MongoDB
 
-**Usage**:
+You can scrape ISW reports for a specific date range from the terminal:
 
 ```bash
-python iws_data_scraper.py 2022-02-24 2025-03-01 mongodb
+# Basic usage
+python iws_data_scraper.py 2022-02-24 2025-03-01
+
+# Optional MongoDB customization
+python iws_data_scraper.py 2022-02-24 2025-03-01 --mongo mongodb://localhost:27017/ --database PythonForDs --collection isw_html
 ```
 
-### 2. HTML Parser (`html_parser.py`)
+**Arguments**:
+
+- First argument: Start date (YYYY-MM-DD)
+- Second argument: End date (YYYY-MM-DD)
+- `--mongo`: Custom MongoDB connection string (optional)
+- `--database`: MongoDB database name (optional)
+- `--collection`: MongoDB collection name (optional)
+
+```bash
+# Run this script to get up-to-date data:
+python iws_data_scraper.py 2022-02-24 today
+
+# To get today's report run this:
+python iws_data_scraper.py today today
+```
+
+### 2. HTML Text Extractor (`html_extractor.py`)
 
 - Extracts text from scraped HTML reports
-- Saves processed text to MongoDB and text files
+- Saves processed text to MongoDB
+
+**Arguments**:
+
+- `--mongo`: Custom MongoDB connection string (optional)
+- `--database`: MongoDB database name (optional)
+- `--input-collection`: MongoDB input collection name (optional)
+- `--output-collection`: MongoDB output collection name (optional)
 
 **Usage**:
 
 ```bash
-python html_parser.py
+# Basic usage
+python html_extractor.py
+
+# Optional MongoDB customization
+python html_extractor.py --mongo mongodb://localhost:27017/ --database PythonForDs --input-collection isw_html --output-collection isw_report
 ```
 
-### 3. Weather Forecast (`weather_forecast.py`)
+### 3. Weather Service API (`get_weather.py`)
 
-- Retrieves weather data for multiple Ukrainian oblasts
-- Saves forecast data to JSON files
+- Flask-based service for getting hourly weather forecasts for Ukrainian regions
+- Uses Visual Crossing Weather API to fetch detailed weather data
+
+**Key Features**:
+
+- Hourly weather data for 24 hours
+- Metrics include:
+    - Temperature
+    - Feels like temperature
+    - Wind speed and direction
+    - Humidity
+    - Atmospheric pressure
+    - Precipitation probability
+    - Weather conditions
+
+
+- Requires `.env` file with `API_TOKEN` and `VISUAL_CROSSING_API_KEY`
+
+**Usage**:
+
+```bash
+# Run the Flask weather service
+flask run
+```
+
+Although you can just run flask, it is better to use WSGI server instead
+
+**API Endpoint**:
+
+- Method: POST
+- URL: http://127.0.0.1:5000
+- Endpoint: `/weather`
+- Required JSON payload:
+  ```json
+  {
+    "token": "your_api_token",
+    "oblast": "Kyiv",
+    "requester_name": "Your Name"
+  }
+  ```
+
+I reccommend you to use postman https://www.postman.com/downloads/
+To use it create postman collection -> add_request and follow text above and click send to get response
+
+### 4. Weather Forecast Aggregator (`weather_forecast.py`)
+
+- Retrieves weather data for Ukrainian oblasts
+- Saves forecast data to JSON files with timestamped filenames
 
 **Usage**:
 
@@ -119,16 +196,11 @@ python html_parser.py
 python weather_forecast.py
 ```
 
-### 4. Alerts Service (`alerts.py`)
+**Key Features**:
 
-- Flask-based API for retrieving active air alerts
-- Requires running a local server
-
-**Usage**:
-
-```bash
-flask run
-```
+- Covers 24 Ukrainian oblasts
+- Automatically generates JSON files with weather data
+- Prints progress and file save location
 
 ## Data Collection Workflow
 

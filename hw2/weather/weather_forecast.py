@@ -30,7 +30,6 @@ def get_weather_for_all_oblasts():
 
             if response.status_code == 200:
                 all_weather_data[oblast] = response.json()
-                print(f"✓")
             else:
                 print(f"Error for {oblast}: {response.status_code} - {response.text}")
         except Exception as e:
