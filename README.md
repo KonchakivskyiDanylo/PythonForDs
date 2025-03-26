@@ -90,7 +90,7 @@ pip install -r requirements.txt
 ```
 API_TOKEN=your_generated_api_token # can be generated on different websites 
 VISUAL_CROSSING_API_KEY=your_visual_crossing_api_key # can be found here https://www.visualcrossing.com/weather-api
-ALERTS_API_TOKEN=your_alerts_api_token # you can apply for API on this website( we got during an hour) https://devs.alerts.in.ua/
+ALERTS_API_TOKEN=your_alerts_api_token # you can apply for API on this website(we received ours within an hour) https://devs.alerts.in.ua/
 ```
 
 2. MongoDB Setup
@@ -100,7 +100,7 @@ ALERTS_API_TOKEN=your_alerts_api_token # you can apply for API on this website( 
 - Database name: `PythonForDs`
 - Collections: `isw_html`, `isw_report`
 
-Database and collections names can be changed if you want.
+You can change the database and collection names if needed
 
 ## Scripts and Their Purposes
 
@@ -184,7 +184,7 @@ python html_extractor.py --mongo-uri mongodb://localhost:27017/ --database Pytho
 python get_weather.py
 ```
 
-Although you can just run python script, it is better to use WSGI server instead
+Although you can run the Python script directly, it is better to use WSGI server instead
 
 **API Endpoint**:
 
@@ -200,7 +200,7 @@ Although you can just run python script, it is better to use WSGI server instead
   }
   ```
 
-Recommend you to use postman https://www.postman.com/downloads/
+We recommend using Postman https://www.postman.com/downloads/
 
 To use it, create postman collection -> add_request -> use text above and click send to get response
 
@@ -215,7 +215,7 @@ To use it, create postman collection -> add_request -> use text above and click 
 python weather_forecast.py
 ```
 
-But make sure get_weather.py is running right now
+Make sure that get_weather.py is currently running
 
 ### 5. Alerts (`alerts.py`)
 
