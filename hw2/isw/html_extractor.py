@@ -1,6 +1,7 @@
 import pymongo
 from bs4 import BeautifulSoup
 import argparse
+import re
 
 
 def validate_mongodb(mongo):
@@ -28,6 +29,23 @@ def extract_text_from_html(html_content):
     return ""
 
 
+def clean_extracted_text(text):
+    # delete references like [1]
+    text = re.sub(r'\[\d+\]', '', text)
+
+    # drop images in the text
+    text = re.sub(
+        r'(Click here to expand the image below\. Satellite image ©\d{4} Maxar Technologies\.)\s*', '', text
+    )
+
+    # drop links in the end
+    split_point = re.search(r'https?://', text)
+    if split_point:
+        text = text[:split_point.start()].rstrip()
+
+    return text.strip()
+
+
 def process_documents(mongo, database, input_collection, output_collection):
     try:
         client = pymongo.MongoClient(mongo)
@@ -45,9 +63,11 @@ def process_documents(mongo, database, input_collection, output_collection):
                 continue
             html_content = doc["html_content"]
             extracted_text = extract_text_from_html(html_content)
+            cleaned_text = clean_extracted_text(extracted_text)
+
             text_doc = {
                 "date": doc["date"],
-                "extracted_text": extracted_text
+                "extracted_text": cleaned_text
             }
             output_coll.insert_one(text_doc)
 
