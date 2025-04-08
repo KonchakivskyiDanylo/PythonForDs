@@ -58,8 +58,9 @@ The project consists of several key modules:
 ### **System Requirements**
 
 - **Python 3.8+**
-- **MongoDB**
+- **MongoDB** 
 - **Git**
+- **Python Libraries** – listed in `requirements.txt`
 
 ### Installation Steps
 
@@ -104,7 +105,7 @@ You can change the database and collection names if needed
 
 ## Scripts and Their Purposes
 
-### 1. ISW Data Scraper (`iws_data_scraper.py`)
+### 1. ISW Data Scraper (`isw_data_scraper.py`)
 
 - Scrapes daily reports from the Institute for the Study of War for a given period of time
 - Saves HTML content to MongoDB
@@ -113,10 +114,10 @@ You can scrape ISW reports for a specific date range from the terminal:
 
 ```bash
 # Basic usage
-python iws_data_scraper.py 2022-02-24 2025-03-01
+python isw_data_scraper.py 2022-02-24 2025-03-01
 
 # Optional MongoDB customization
-python iws_data_scraper.py 2022-02-24 2025-03-01 --mongo mongodb://localhost:27017/ --database PythonForDs --collection isw_html
+python isw_data_scraper.py 2022-02-24 2025-03-01 --mongo mongodb://localhost:27017/ --database PythonForDs --collection isw_html
 ```
 
 **Arguments**:
@@ -129,15 +130,18 @@ python iws_data_scraper.py 2022-02-24 2025-03-01 --mongo mongodb://localhost:270
 
 ```bash
 # Run this script to get from the given data until today:
-python iws_data_scraper.py 2022-02-24 
+python isw_data_scraper.py 2022-02-24 
 
 # To get today's report run this:
-python iws_data_scraper.py 
+python isw_data_scraper.py 
 ```
+
+> **Note:** Downloading the complete dataset from `2022-02-24` to today may take up to **10 minutes**.
+> Please note that some data may be missing for New Year’s, Christmas, and `2022-11-24`.
 
 ### 2. HTML Text Extractor (`html_extractor.py`)
 
-- Extracts text from scraped HTML reports
+- Parses and extracts text content from all scraped HTML reports in the given database collection
 - Saves processed text to MongoDB
 
 **Arguments**:
