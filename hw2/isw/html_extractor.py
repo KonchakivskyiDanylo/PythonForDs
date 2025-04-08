@@ -13,69 +13,44 @@ def validate_mongodb(mongo):
 def extract_text_from_html(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
 
-    # Remove specific elements that contain metadata
-    for element in soup(["script", "style", "nav", "footer", "header"]):
-        element.extract()
+    for script in soup(["script", "style", "nav", "footer", "header"]):
+        script.extract()
 
-    # Find the main content - looking for div with class 'field-item' which seems to contain the actual article
-    main_content = soup.find('div', class_='field-item even', property='content:encoded')
-
-    if not main_content:
-        # Fallback to general content div or body
-        main_content = soup.find('div', class_='content') or soup.body
+    main_content = soup.find('div', class_='content') or soup.body
 
     if main_content:
-        # Extract all paragraphs with their original order
-        paragraphs = []
-        for p in main_content.find_all('p'):
-            paragraphs.append(p.get_text().strip())
+        paragraphs = main_content.find_all('p')
 
-        return paragraphs
+        start_index = -1
+        for i, paragraph in enumerate(paragraphs):
+            text = paragraph.get_text()
+            if 'ET' in text or "EST" in text:
+                start_index = i
+                break
 
-    return []
+        if start_index != -1:
+            paragraphs = paragraphs[start_index + 1:]
+
+        unwanted_prefixes = {"click", "isw", "note", "correction"}
+
+        text = '\n\n'.join([
+            p.get_text().strip()
+            for p in paragraphs
+            if not any(p.get_text().strip().lower().startswith(prefix) for prefix in unwanted_prefixes)
+        ])
+
+        headings = main_content.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+        heading_text = '\n\n'.join([h.get_text().strip() for h in headings])
+
+        full_text = heading_text + '\n\n' + text
+        return ' '.join(full_text.split())
+
+    return ""
 
 
-def clean_extracted_text(paragraphs):
-    if not paragraphs:
-        return ""
-
-    # Identify metadata paragraphs (first paragraphs with author names and dates)
-    skip_paragraphs = 0
-    metadata_patterns = [
-        # Pattern for author names
-        r'^[A-Z][a-z]+ [A-Z][a-z]+',
-        # Pattern for dates
-        r'(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+',
-        # Pattern for time
-        r'\d+:\d+\s*(am|pm|EST)',
-        # Pattern for italicized metadata (like "Press")
-        r'^ISW Press$'
-    ]
-
-    # Check first paragraphs for metadata patterns
-    for i, paragraph in enumerate(paragraphs):
-        if i > 2:  # Normally metadata is in first 1-2 paragraphs
-            break
-
-        # Check if paragraph matches any metadata pattern
-        is_metadata = any(re.search(pattern, paragraph) for pattern in metadata_patterns)
-
-        # If it's short and looks like metadata, skip it
-        if is_metadata and len(paragraph.split()) < 20:
-            skip_paragraphs = i + 1
-        else:
-            # Found first real content paragraph
-            break
-
-    # Join remaining paragraphs (starting after metadata)
-    cleaned_paragraphs = paragraphs[skip_paragraphs:]
-    if not cleaned_paragraphs:
-        # Fallback - if we somehow removed all paragraphs, return original
-        return " ".join(paragraphs)
-
-    text = " ".join(cleaned_paragraphs)
-
-    # Further cleaning
+def clean_extracted_text(text):
+    if text.lower().startswith("tags"):
+        text = ' '.join(text.split()[1:])
     # delete references like [1]
     text = re.sub(r'\[\d+\]', '', text)
 
@@ -103,32 +78,22 @@ def process_documents(mongo, database, input_collection, output_collection):
         return
 
     documents = input_coll.find({})
-    count = 0
     for doc in documents:
         try:
             if output_coll.find_one({"date": doc["date"]}):
                 continue
-
             html_content = doc["html_content"]
-            extracted_paragraphs = extract_text_from_html(html_content)
-            cleaned_text = clean_extracted_text(extracted_paragraphs)
-
-            # Debug output - print first and last part of text
-            if cleaned_text:
-                print(f"\nDocument from {doc['date']}:")
-                print(f"Starts with: {cleaned_text[:100]}...")
+            extracted_text = extract_text_from_html(html_content)
+            cleaned_text = clean_extracted_text(extracted_text)
 
             text_doc = {
                 "date": doc["date"],
                 "extracted_text": cleaned_text
             }
             output_coll.insert_one(text_doc)
-            count += 1
 
         except Exception as e:
             print(f"Error processing document: {e}")
-
-    print(f"\nTotal documents processed: {count}")
 
 
 def main():
@@ -142,7 +107,6 @@ def main():
                         help="Input MongoDB collection name (default: isw_html)")
     parser.add_argument("--output-collection", default="isw_report",
                         help="Output MongoDB collection name (default: isw_report)")
-
     args = parser.parse_args()
     process_documents(args.mongo, args.database, args.input_collection, args.output_collection)
 
