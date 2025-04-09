@@ -73,9 +73,10 @@ def scrape_data(start_date, end_date, collection):
 
 def main():
     today = datetime.now().date()
+    start = validate_date("2022-02-24")
     parser = argparse.ArgumentParser(description="ISW Report Scraper")
     parser.add_argument("start_date", nargs='?', type=validate_date,
-                        default=today,
+                        default=start,
                         help="Start date (YYYY-MM-DD), defaults to today")
     parser.add_argument("end_date", nargs='?', type=validate_date,
                         default=today,
