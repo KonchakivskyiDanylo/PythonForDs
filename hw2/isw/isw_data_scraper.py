@@ -26,7 +26,7 @@ def format_date(date, include_year=True):
 def scrape_report(date, collection):
     date_with_year = format_date(date)
     date_without_year = format_date(date, include_year=False)
-    #all links with reports
+    # all links with reports
     url_formats = [
         f"https://www.understandingwar.org/backgrounder/russian-offensive-campaign-assessment-{date_with_year}",
         f"https://www.understandingwar.org/backgrounder/russian-offensive-campaign-assessment-{date_without_year}",
@@ -73,10 +73,9 @@ def scrape_data(start_date, end_date, collection):
 
 def main():
     today = datetime.now().date()
-    start = validate_date("2022-02-24")
     parser = argparse.ArgumentParser(description="ISW Report Scraper")
     parser.add_argument("start_date", nargs='?', type=validate_date,
-                        default=start,
+                        default=today,
                         help="Start date (YYYY-MM-DD), defaults to today")
     parser.add_argument("end_date", nargs='?', type=validate_date,
                         default=today,
