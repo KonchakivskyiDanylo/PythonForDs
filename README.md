@@ -51,14 +51,14 @@ The project consists of several key modules:
 2. **Forecasting Module**: Prepares and executes prediction models
 3. **Frontend UI**: Interaction interface for the backend
 
-2 and 3 will be implemented soon
+3 will be implemented soon
 
 ## **Prerequisites**
 
 ### **System Requirements**
 
 - **Python 3.8+**
-- **MongoDB** 
+- **MongoDB**
 - **Git**
 - **Python Libraries** – listed in `requirements.txt`
 
@@ -67,8 +67,8 @@ The project consists of several key modules:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/war-event-prediction.git
-cd war-event-prediction
+git clone https://github.com/KonchakivskyiDanylo/PythonForDs.git
+cd PythonForDs
 ```
 
 2. Create a virtual environment:
@@ -252,12 +252,71 @@ Although you can just run python script, it is better to use WSGI server instead
 
 You can use it in postman with all the info in the end of 3rd paragraph
 
+## Data Collection and Analysis Workflow
+
+### Data Directory Structure (`/data`)
+
+The `data` directory contains raw datasets collected from various sources:
+
+- `alarms.csv` - Historical air alarm events across Ukrainian regions
+- `regions.csv` - Information about Ukrainian regions
+- `weather.csv` - Historical weather data for Ukrainian regions
+
+Note: While weather.csv and regions.csv are openly available data, access to alarms.csv requires special permission.
+Please contact us or the air-alarms.in.ua service to request access to
+this data.
+
+### Data Analysis (`/data_analysis`)
+
+The `data_analysis` directory contains Jupyter notebooks for comprehensive data analysis:
+
+- `alarms_analysis.ipynb` - Processes raw data from `data/alarms.csv`, performs exploratory analysis with
+  visualizations, and prepares cleaned alarm data for merging.
+
+- `isw_analysis.ipynb` - Analyzes text data from MongoDB collections, creates TF-IDF (Term Frequency-Inverse Document
+  Frequency) vectors
+  from the reports, and generates a matrix with coefficients saved to `isw_prepared.csv`. Before running this notebook,
+  ensure you've executed the ISW scraper scripts and have the MongoDB server running.
+
+- `weather_analysis.ipynb` - Processes raw weather data from `data/weather.csv`, visualizes weather patterns, and
+  prepares weather features for the model.
+
+- `merge_datasets.ipynb` - Combines the three preprocessed datasets along with `regions.csv`, identifies correlations
+  between features, and removes unnecessary variables to create the final optimized dataset for model training.
+
+### Processed Data (`/prepared_data`)
+
+After analysis, the processed datasets are stored in the `prepared_data` directory:
+
+- `alarms_prepared.csv` - Cleaned and preprocessed alarm event data
+- `isw_prepared.csv` - Matrix of TF-IDF coefficients extracted from ISW reports
+- `weather_prepared.csv` - Processed weather features with relevant parameters for prediction
+- `final_dataset.csv` - Combined dataset with optimized features, ready for model training
+
+## Model Training and Evaluation
+
+### Model Implementation (`model.ipynb`)
+
+The `model.ipynb` notebook contains the implementation of our prediction models:
+
+- Currently implements Linear Regression and Logistic Regression models
+- Feature selection and engineering from the combined dataset
+- Model training process with time series split to properly evaluate temporal data
+- Performance evaluation using various metrics
+- Visualizations of model performance and predictions
+
+Future work will include implementation of more sophisticated models
+
 ## Data Collection Workflow
 
 1. Run ISW scraper to collect historical reports
 2. Process HTML reports using parser
-3. Collect weather forecasts
-4. Retrieve active alerts
+3. Obtain weather data and region information from available sources
+4. Request permission for alarm data and obtain it
+5. Run analysis notebooks to process all collected datasets
+6. Train and evaluate prediction models using the final dataset
+7. Collect weather forecasts for real-time predictions
+8. Retrieve active alerts for model validation and real-time use
 
 ## Acknowledgments
 
