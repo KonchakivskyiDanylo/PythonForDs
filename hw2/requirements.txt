@@ -1,7 +1,0 @@
-requests==2.32.3
-pymongo==4.11.3
-argparse==1.4.0
-beautifulsoup4==4.13.3
-flask==3.1.0
-python-dotenv==1.1.0
-alerts_in_ua==0.2.7
