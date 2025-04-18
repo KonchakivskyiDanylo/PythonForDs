@@ -11,7 +11,7 @@ URL = "http://127.0.0.1:5000/weather"
 
 def get_weather_for_all_regions():
     regions = [
-        "Kyiv", "Lviv", "Kharkiv", "Odesa", "Dnipro", "Zaporizhzhia", "Vinnytsia", "Poltava", "Zhytomyr",
+        "Lviv", "Kyiv",  "Kharkiv", "Odesa", "Dnipro", "Zaporizhzhia", "Vinnytsia", "Poltava", "Zhytomyr",
         "Khmelnytskyi", "Uzhhorod", "Ivano-Frankivsk", "Chernivtsi", "Ternopil", "Cherkasy", "Kropyvnytskyi",
         "Mykolaiv", "Kherson", "Sumy", "Chernihiv", "Rivne", "Lutsk", "Kramatorsk", "Sievierodonetsk"
     ]
