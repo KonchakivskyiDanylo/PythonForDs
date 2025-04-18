@@ -31,10 +31,10 @@ class InvalidUsage(Exception):
         return rv
 
 
-def get_hourly_weather_data(oblast: str):
-    city = oblast + ", Ukraine"
+def get_hourly_weather_data(region: str):
+    city = region + ", Ukraine"
     if not city:
-        raise InvalidUsage(f"{oblast} is not found", status_code=400)
+        raise InvalidUsage(f"{region} is not found", status_code=400)
 
     today = dt.datetime.now().strftime("%Y-%m-%d")
     tomorrow = (dt.datetime.now() + dt.timedelta(days=1)).strftime("%Y-%m-%d")
@@ -51,7 +51,16 @@ def get_hourly_weather_data(oblast: str):
             hourly_data = []
             hours_needed = 24
 
+            city_latitude = data.get("latitude")
+            city_longitude = data.get("longitude")
+
             for day in data.get("days", []):
+                day_tempmax = day.get("tempmax")
+                day_tempmin = day.get("tempmin")
+                day_temp = day.get("temp")
+                day_precipcover = day.get("precipcover", 0)
+                day_moonphase = day.get("moonphase", 0)
+
                 for hour_data in day.get("hours", []):
                     hour_time = dt.datetime.strptime(hour_data.get("datetime"), "%H:%M:%S")
                     hour = hour_time.hour
@@ -59,17 +68,40 @@ def get_hourly_weather_data(oblast: str):
                     if day == data.get("days", [])[0] and hour < current_hour:
                         continue
 
+                    hour_datetime = f"{day.get('datetime')}T{hour_data.get('datetime')}"
+                    hour_datetime_obj = dt.datetime.strptime(hour_datetime, "%Y-%m-%dT%H:%M:%S")
+                    hour_datetimeEpoch = int(hour_datetime_obj.timestamp())
+
                     hourly_data.append({
-                        "datetime": f"{day.get('datetime')} {hour_data.get('datetime')}",
+                        "datetime": hour_datetime,
+                        "hour_datetimeEpoch": hour_datetimeEpoch,
+                        "city_latitude": city_latitude,
+                        "city_longitude": city_longitude,
+                        "day_tempmax": day_tempmax,
+                        "day_tempmin": day_tempmin,
+                        "day_temp": day_temp,
+                        "day_precipcover": day_precipcover,
+                        "day_moonphase": day_moonphase,
                         "hour": hour,
-                        "temperature_c": hour_data.get("temp"),
-                        "feels_like_c": hour_data.get("feelslike"),
-                        "wind_speed_kmh": hour_data.get("windspeed"),
-                        "wind_direction": hour_data.get("winddir"),
-                        "humidity_pct": hour_data.get("humidity"),
-                        "pressure_mb": hour_data.get("pressure"),
-                        "precip_probability_pct": hour_data.get("precipprob"),
-                        "conditions": hour_data.get("conditions")
+                        "hour_temp": hour_data.get("temp"),
+                        "hour_humidity": hour_data.get("humidity"),
+                        "hour_dew": hour_data.get("dew"),
+                        "hour_precip": hour_data.get("precip", 0),
+                        "hour_precipprob": hour_data.get("precipprob", 0),
+                        "hour_snow": hour_data.get("snow", 0),
+                        "hour_snowdepth": hour_data.get("snowdepth", 0),
+                        "hour_preciptype": hour_data.get("preciptype", ""),
+                        "hour_windgust": hour_data.get("windgust", 0),
+                        "hour_windspeed": hour_data.get("windspeed", 0),
+                        "hour_winddir": hour_data.get("winddir", 0),
+                        "hour_pressure": hour_data.get("pressure", 0),
+                        "hour_visibility": hour_data.get("visibility", 0),
+                        "hour_cloudcover": hour_data.get("cloudcover", 0),
+                        "hour_solarradiation": hour_data.get("solarradiation", 0),
+                        "hour_solarenergy": hour_data.get("solarenergy", 0),
+                        "hour_uvindex": hour_data.get("uvindex", 0),
+                        "hour_conditions": hour_data.get("conditions", ""),
+                        "region": region
                     })
 
                     hours_needed -= 1
@@ -80,7 +112,7 @@ def get_hourly_weather_data(oblast: str):
                     break
 
             return {
-                "oblast": oblast,
+                "region": region,
                 "hourly_forecast": hourly_data
             }
         else:
@@ -108,13 +140,13 @@ def weather_endpoint():
     if json_data.get("token") != API_TOKEN:
         raise InvalidUsage("Invalid API token", status_code=403)
 
-    oblast = json_data.get("oblast")
+    region = json_data.get("region")
     requester_name = json_data.get("requester_name")
 
-    if not oblast or not requester_name:
+    if not region or not requester_name:
         raise InvalidUsage("Missing required fields", status_code=400)
 
-    weather_data = get_hourly_weather_data(oblast)
+    weather_data = get_hourly_weather_data(region)
 
     result = {
         "requester": requester_name,
