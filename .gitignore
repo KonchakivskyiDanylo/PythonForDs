@@ -175,3 +175,5 @@ cython_debug/
 
 data/*.csv
 prepared_data/*.csv
+
+models/*.pkl
