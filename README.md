@@ -262,9 +262,10 @@ The `data` directory contains raw datasets collected from various sources:
 - `regions.csv` - Information about Ukrainian regions
 - `weather.csv` - Historical weather data for Ukrainian regions
 
-Note: While weather.csv and regions.csv are openly available data, access to alarms.csv requires special permission.
-Please contact us or the air-alarms.in.ua service to request access to
-this data.
+> **Note:** While weather.csv and regions.csv are openly available data, access to alarms.csv requires special
+> permission.
+> Please contact us or the air-alarms.in.ua service to request access to
+> this data.
 
 ### Data Analysis (`/data_analysis`)
 
@@ -279,7 +280,7 @@ The `data_analysis` directory contains Jupyter notebooks for comprehensive data 
   ensure you've executed the ISW scraper scripts and have the MongoDB server running.
 
 - `weather_analysis.ipynb` - Processes raw weather data from `data/weather.csv`, visualizes weather patterns, and
-  prepares weather features for the model.
+  prepares weather features for merging.
 
 - `merge_datasets.ipynb` - Combines the three preprocessed datasets along with `regions.csv`, identifies correlations
   between features, and removes unnecessary variables to create the final optimized dataset for model training.
@@ -299,8 +300,8 @@ After analysis, the processed datasets are stored in the `prepared_data` directo
 
 The `model.ipynb` notebook contains the implementation of our prediction models:
 
-- Currently implements Linear Regression and Logistic Regression models
-- Feature selection and engineering from the combined dataset
+- Implements Linear Regression and Logistic Regression models
+- Pipeline that includes **scaling**, **one-hot encoding**, and other preprocessing steps.
 - Model training process with time series split to properly evaluate temporal data
 - Performance evaluation using various metrics
 - Visualizations of model performance and predictions
