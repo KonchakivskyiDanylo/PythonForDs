@@ -13,30 +13,30 @@ if not API_TOKEN or not VISUAL_CROSSING_API_KEY:
     raise ValueError("Missing API keys. Please set them in the .env file.")
 
 REGIONS = {
-    "Lviv": "Львівська",
-    "Kyiv": "Київська",
-    "Kharkiv": "Харківська",
-    "Odesa": "Одеська",
-    "Dnipro": "Дніпропетровська",
-    "Zaporizhzhia": "Запорізька",
-    "Vinnytsia": "Вінницька",
-    "Poltava": "Полтавська",
-    "Zhytomyr": "Житомирська",
-    "Khmelnytskyi": "Хмельницька",
-    "Uzhhorod": "Закарпатська",
-    "Ivano-Frankivsk": "Івано-Франківська",
-    "Chernivtsi": "Чернівецька",
-    "Ternopil": "Тернопільська",
-    "Cherkasy": "Черкаська",
-    "Kropyvnytskyi": "Кіровоградська",
-    "Mykolaiv": "Миколаївська",
-    "Kherson": "Херсонська",
-    "Sumy": "Сумська",
-    "Chernihiv": "Чернігівська",
-    "Rivne": "Рівненська",
-    "Lutsk": "Волинська",
-    "Kramatorsk": "Донецька",
-    "Sievierodonetsk": "Луганська"
+    "Львівська": "Lviv",
+    "Київська": "Kyiv",
+    "Київ": "Kyiv",
+    "Харківська": "Kharkiv",
+    "Одеська": "Odesa",
+    "Дніпропетровська": "Dnipro",
+    "Запорізька": "Zaporizhzhia",
+    "Вінницька": "Vinnytsia",
+    "Полтавська": "Poltava",
+    "Житомирська": "Zhytomyr",
+    "Хмельницька": "Khmelnytskyi",
+    "Закарпатська": "Uzhhorod",
+    "Івано-Франківська": "Ivano-Frankivsk",
+    "Чернівецька": "Chernivtsi",
+    "Тернопільська": "Ternopil",
+    "Черкаська": "Cherkasy",
+    "Кіровоградська": "Kropyvnytskyi",
+    "Миколаївська": "Mykolaiv",
+    "Херсонська": "Kherson",
+    "Сумська": "Sumy",
+    "Чернігівська": "Chernihiv",
+    "Рівненська": "Rivne",
+    "Волинська": "Lutsk",
+    "Донецька": "Kramatorsk"
 }
 
 
@@ -156,7 +156,7 @@ def get_hourly_weather_data(region: str, region_name: str):
         raise InvalidUsage(f"Error getting weather data: {str(e)}", status_code=500)
 
 
-def collect_and_save_weather():
+def main():
     """
     Collects hourly weather data for predefined regions and saves it into a MongoDB
     collection.
@@ -174,7 +174,7 @@ def collect_and_save_weather():
             ("region", pymongo.ASCENDING)
         ], unique=True)
 
-        for region_en, region_ua in REGIONS.items():
+        for region_ua, region_en in REGIONS.items():
             try:
                 weather_data = get_hourly_weather_data(region_en, region_ua)
 
@@ -192,4 +192,4 @@ def collect_and_save_weather():
 
 
 if __name__ == "__main__":
-    collect_and_save_weather()
+    main()

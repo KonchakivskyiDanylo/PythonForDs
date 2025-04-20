@@ -165,9 +165,10 @@ def main():
     :return: None
     """
     today = datetime.now().date()
+    yesterday = today - timedelta(days=1)
     parser = argparse.ArgumentParser(description="ISW Report Scraper")
     parser.add_argument("start_date", nargs='?', type=validate_date,
-                        default=today,
+                        default=yesterday,
                         help="Start date (YYYY-MM-DD), defaults to today")
     parser.add_argument("end_date", nargs='?', type=validate_date,
                         default=today,
