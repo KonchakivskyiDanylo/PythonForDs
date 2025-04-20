@@ -1,7 +1,7 @@
 import datetime as dt
 import requests
-from flask import Flask, jsonify, request
 import os
+import pymongo
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,7 +12,32 @@ VISUAL_CROSSING_API_KEY = os.getenv("VISUAL_CROSSING_API_KEY")
 if not API_TOKEN or not VISUAL_CROSSING_API_KEY:
     raise ValueError("Missing API keys. Please set them in the .env file.")
 
-app = Flask(__name__)
+REGIONS = {
+    "Lviv": "Львівська",
+    "Kyiv": "Київська",
+    "Kharkiv": "Харківська",
+    "Odesa": "Одеська",
+    "Dnipro": "Дніпропетровська",
+    "Zaporizhzhia": "Запорізька",
+    "Vinnytsia": "Вінницька",
+    "Poltava": "Полтавська",
+    "Zhytomyr": "Житомирська",
+    "Khmelnytskyi": "Хмельницька",
+    "Uzhhorod": "Закарпатська",
+    "Ivano-Frankivsk": "Івано-Франківська",
+    "Chernivtsi": "Чернівецька",
+    "Ternopil": "Тернопільська",
+    "Cherkasy": "Черкаська",
+    "Kropyvnytskyi": "Кіровоградська",
+    "Mykolaiv": "Миколаївська",
+    "Kherson": "Херсонська",
+    "Sumy": "Сумська",
+    "Chernihiv": "Чернігівська",
+    "Rivne": "Рівненська",
+    "Lutsk": "Волинська",
+    "Kramatorsk": "Донецька",
+    "Sievierodonetsk": "Луганська"
+}
 
 
 class InvalidUsage(Exception):
@@ -31,7 +56,20 @@ class InvalidUsage(Exception):
         return rv
 
 
-def get_hourly_weather_data(region: str):
+def get_hourly_weather_data(region: str, region_name: str):
+    """
+    Fetches and processes hourly weather forecast data for the specified region.
+
+    :param region: The geographical region identifier used to specify the city.
+    :type region: str
+
+    :param region_name: The name of the region in Ukrainian.
+    :type region_name: str
+
+    :return: A dictionary containing the region name, an array of hourly forecast data
+        for the next 24 hours, and the timestamp of when the data was collected.
+    :rtype: dict
+    """
     city = region + ", Ukraine"
     if not city:
         raise InvalidUsage(f"{region} is not found", status_code=400)
@@ -69,12 +107,9 @@ def get_hourly_weather_data(region: str):
                         continue
 
                     hour_datetime = f"{day.get('datetime')}T{hour_data.get('datetime')}"
-                    hour_datetime_obj = dt.datetime.strptime(hour_datetime, "%Y-%m-%dT%H:%M:%S")
-                    hour_datetimeEpoch = int(hour_datetime_obj.timestamp())
 
                     hourly_data.append({
                         "datetime": hour_datetime,
-                        "hour_datetimeEpoch": hour_datetimeEpoch,
                         "city_latitude": city_latitude,
                         "city_longitude": city_longitude,
                         "day_tempmax": day_tempmax,
@@ -82,7 +117,6 @@ def get_hourly_weather_data(region: str):
                         "day_temp": day_temp,
                         "day_precipcover": day_precipcover,
                         "day_moonphase": day_moonphase,
-                        "hour": hour,
                         "hour_temp": hour_data.get("temp"),
                         "hour_humidity": hour_data.get("humidity"),
                         "hour_dew": hour_data.get("dew"),
@@ -101,7 +135,7 @@ def get_hourly_weather_data(region: str):
                         "hour_solarenergy": hour_data.get("solarenergy", 0),
                         "hour_uvindex": hour_data.get("uvindex", 0),
                         "hour_conditions": hour_data.get("conditions", ""),
-                        "region": region
+                        "region": region_name
                     })
 
                     hours_needed -= 1
@@ -112,8 +146,9 @@ def get_hourly_weather_data(region: str):
                     break
 
             return {
-                "region": region,
-                "hourly_forecast": hourly_data
+                "region": region_name,
+                "hourly_forecast": hourly_data,
+                "collected_at": dt.datetime.now(dt.timezone.utc).isoformat()
             }
         else:
             raise InvalidUsage(response.text, status_code=response.status_code)
@@ -121,41 +156,40 @@ def get_hourly_weather_data(region: str):
         raise InvalidUsage(f"Error getting weather data: {str(e)}", status_code=500)
 
 
-@app.errorhandler(InvalidUsage)
-def handle_invalid_usage(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
+def collect_and_save_weather():
+    """
+    Collects hourly weather data for predefined regions and saves it into a MongoDB
+    collection.
 
+    :raises Exception: If there is an error connecting to the MongoDB database.
+                  Errors related to individual weather data retrieval are logged
+                  but do not cause the main process to terminate.
+    """
+    try:
+        client = pymongo.MongoClient("mongodb://localhost:27017")
+        db = client["PythonForDs"]
+        weather_collection = db["weather"]
 
-@app.route("/")
-def home_page():
-    return "<p><h2>Weather Service for Ukrainian Regions</h2></p>"
+        weather_collection.create_index([
+            ("region", pymongo.ASCENDING)
+        ], unique=True)
 
+        for region_en, region_ua in REGIONS.items():
+            try:
+                weather_data = get_hourly_weather_data(region_en, region_ua)
 
-@app.route("/weather", methods=["POST"])
-def weather_endpoint():
-    json_data = request.get_json()
+                weather_collection.update_one(
+                    {"region": region_ua},
+                    {"$set": weather_data},
+                    upsert=True
+                )
 
-    if json_data.get("token") != API_TOKEN:
-        raise InvalidUsage("Invalid API token", status_code=403)
+            except Exception as e:
+                print(f"Error handling weather for {region_en}: {str(e)}")
 
-    region = json_data.get("region")
-    requester_name = json_data.get("requester_name")
-
-    if not region or not requester_name:
-        raise InvalidUsage("Missing required fields", status_code=400)
-
-    weather_data = get_hourly_weather_data(region)
-
-    result = {
-        "requester": requester_name,
-        "request_time": dt.datetime.now(dt.timezone.utc).isoformat() + "Z",
-        "data": weather_data
-    }
-
-    return jsonify(result)
+    except Exception as e:
+        print(f"Database error: {str(e)}")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    collect_and_save_weather()
