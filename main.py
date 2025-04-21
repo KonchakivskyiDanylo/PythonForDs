@@ -1,6 +1,9 @@
 from get_data.isw import last_isw
 from get_data.weather import get_weather
+<<<<<<< HEAD
 from get_data.alerts import main as get_alerts
+=======
+>>>>>>> origin/main
 import pandas as pd
 import pymongo
 import pickle
@@ -27,6 +30,7 @@ def load_weather_data():
         raise RuntimeError(f"Failed to load weather data: {e}")
 
 
+<<<<<<< HEAD
 def load_alarms_data():
     """Loading ongoing alarms"""
     try:
@@ -48,6 +52,9 @@ def load_alarms_data():
 
 
 def preprocess_data(df: pd.DataFrame, isw_df: pd.DataFrame, alarms_df: pd.DataFrame = None) -> pd.DataFrame:
+=======
+def preprocess_data(df: pd.DataFrame, isw_df: pd.DataFrame) -> pd.DataFrame:
+>>>>>>> origin/main
     """Prepares the dataset for prediction."""
     df["datetime"] = pd.to_datetime(df["datetime"])
     df["hour_preciptype"] = df["hour_preciptype"].fillna("none").astype(str)
@@ -58,6 +65,7 @@ def preprocess_data(df: pd.DataFrame, isw_df: pd.DataFrame, alarms_df: pd.DataFr
     isw_expanded = pd.concat([isw_df] * len(df), ignore_index=True)
     df_combined = pd.concat([df.reset_index(drop=True), isw_expanded], axis=1)
 
+<<<<<<< HEAD
     if alarms_df is not None and not alarms_df.empty:
         df_combined["has_active_alarm"] = df_combined["region"].apply(
             lambda region: 1 if region in alarms_df["region"].values else 0
@@ -74,6 +82,8 @@ def preprocess_data(df: pd.DataFrame, isw_df: pd.DataFrame, alarms_df: pd.DataFr
         df_combined["has_active_alarm"] = 0
         df_combined["alert_type"] = "none"
 
+=======
+>>>>>>> origin/main
     return df_combined
 
 
@@ -84,6 +94,7 @@ def load_model(path: str):
 
 
 def run_prediction():
+<<<<<<< HEAD
     # Step 1: Update weather, ISW, and alarms data
     get_weather.main()
     isw_df = last_isw.main()
@@ -92,14 +103,30 @@ def run_prediction():
     # Step 2: Load and prepare data
     df_weather = load_weather_data()
     df_processed = preprocess_data(df_weather, isw_df, alarms_df)  # Pass alarms data to preprocessing
+=======
+    # Step 1: Update weather & ISW data
+    get_weather.main()
+    isw_df = last_isw.main()
+
+    # Step 2: Load and prepare data
+    df_weather = load_weather_data()
+    df_processed = preprocess_data(df_weather, isw_df)
+>>>>>>> origin/main
 
     # Step 3: Extract useful columns
     datetime_col = df_processed["datetime"]
     region_col = df_processed["region"]
+<<<<<<< HEAD
     X = df_processed.drop(columns=["datetime", "region"])  # Ensure region is dropped as well
 
     # Step 4: Predict
     model = load_model("RandomForestClassifier_model.pkl")
+=======
+    X = df_processed.drop(columns=["datetime"])
+
+    # Step 4: Predict
+    model = load_model("models/RandomForestClassifier_model.pkl")
+>>>>>>> origin/main
     predictions = model.predict(X)
 
     # Step 5: Save results
@@ -110,12 +137,21 @@ def run_prediction():
     })
     print(results_df)
 
+<<<<<<< HEAD
+=======
+
+    #Don't know how to save better, by regions or 1 by 1, i think better by regions
+>>>>>>> origin/main
     # Step 6: Save to MongoDB
     try:
         client = pymongo.MongoClient("mongodb://localhost:27017")
         db = client["PythonForDs"]
         prediction_collection = db["prediction"]
+<<<<<<< HEAD
         prediction_collection.delete_many({})  # Clear previous predictions
+=======
+        prediction_collection.delete_many({})#Сlear previous predictions
+>>>>>>> origin/main
         prediction_collection.insert_many(results_df.to_dict("records"))
     except Exception as db_error:
         raise RuntimeError(f"Failed to save predictions to MongoDB: {db_error}")
@@ -125,4 +161,8 @@ if __name__ == "__main__":
     try:
         run_prediction()
     except Exception as e:
+<<<<<<< HEAD
         print(f"Error occurred: {e}")
+=======
+        print(f"Error occurred: {e}")
+>>>>>>> origin/main
