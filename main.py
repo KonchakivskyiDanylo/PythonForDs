@@ -1,6 +1,5 @@
 from get_data.isw import last_isw
 from get_data.weather import get_weather
-# from get_data.alerts import main as get_alerts
 import pandas as pd
 import pymongo
 import pickle
