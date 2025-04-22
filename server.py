@@ -1,12 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import pymongo
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+from flask_cors import CORS
 
 load_dotenv()
 API_TOKEN = os.getenv("API_TOKEN")
 app = Flask(__name__)
+CORS(app)
 
 
 class InvalidUsage(Exception):
@@ -24,11 +26,13 @@ class InvalidUsage(Exception):
         rv["message"] = self.message
         return rv
 
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-@app.route("/predict", methods=["POST"])
+@app.route("/predict", methods=["POST","GET","OPTIONS"])
 def get_prediction():
     json_data = request.get_json()
-
     if json_data.get("token") != API_TOKEN:
         raise InvalidUsage("Invalid API token", status_code=403)
     region = json_data.get("region")
@@ -63,7 +67,6 @@ def get_prediction():
             "regions_forecast": forecasts
         }
         return jsonify(response_data)
-
 
 if __name__ == "__main__":
     app.run(debug=True)

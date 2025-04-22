@@ -5,7 +5,6 @@ import pymongo
 import pickle
 
 def load_weather_data():
-    """Connects to MongoDB and loads hourly weather data with region info."""
     try:
         client = pymongo.MongoClient("mongodb://localhost:27017")
         db = client["PythonForDs"]
@@ -69,7 +68,7 @@ def run_prediction():
     datetime_col = df_processed["datetime"]
     region_col = df_processed["region"]
     X = df_processed.drop(columns=["datetime"])
-
+    X["region"]="None"
     # Step 4: Predict
     model = load_model("models/RandomForestClassifier_model.pkl")
     predictions = model.predict(X)
@@ -80,9 +79,7 @@ def run_prediction():
         "region": region_col,
         "predictions": predictions
     })
-    print(results_df)
 
-    # Don't know how to save better, by regions or 1 by 1, i think better by regions
     # Step 6: Save to MongoDB
     try:
         client = pymongo.MongoClient("mongodb://localhost:27017")

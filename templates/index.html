@@ -448,16 +448,18 @@ document.querySelectorAll("svg path").forEach(path => {
   path.addEventListener("click", () => {
     const regionId = path.id;
     document.getElementById("info").textContent = `Область: ${regionId}`;
+    const payload = JSON.stringify({
+      token: API_TOKEN,
+      region: regionId
+    });
+    console.log("Sending payload:", payload);
 
     fetch("http://127.0.0.1:5000/predict", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        token: API_TOKEN,
-        region: regionId
-      })
+      body: payload
     })
     .then(res => res.json())
     .then(data => {
@@ -465,76 +467,33 @@ document.querySelectorAll("svg path").forEach(path => {
       const regionData = data[regionId];
 
       if (!regionData || regionData.length === 0) {
-        box.innerHTML = `<strong>Помилка:</strong> Немає прогнозу для області ${regionId}`;
+        box.textContent = `Помилка: Немає прогнозу для області ${regionId}`;
         box.style.display = "block";
         return;
       }
 
-      // Створюємо таблицю
-      let tableRows = '';
+      // Створюємо текстовий вміст
+      let displayText = `Прогноз тривог для ${regionId}:\n\n`;
 
-      // Перебираємо дані та формуємо рядки таблиці
+      // Перебираємо дані та формуємо текстові рядки
       regionData.forEach(p => {
         const predDate = new Date(p.datetime);
         const hour = predDate.getHours().toString().padStart(2, '0');
 
         // Перетворюємо 1/0 на так/ні
         const alertValue = p.prediction === 1 ? 'Так' : 'Ні';
-        const alertClass = p.prediction === 1 ? 'alert-yes' : 'alert-no';
 
-        tableRows += `
-          <tr>
-            <td>${hour}:00</td>
-            <td class="${alertClass}">${alertValue}</td>
-          </tr>
-        `;
+        displayText += `${hour}:00 - Тривога: ${alertValue}\n`;
       });
 
-      // Створюємо повний HTML таблиці
-      box.innerHTML = `
-        <h3>Прогноз тривог для <b>${regionId}</b></h3>
-        <table class="alert-table">
-          <thead>
-            <tr>
-              <th>Година</th>
-              <th>Тривога</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tableRows}
-          </tbody>
-        </table>
-        <style>
-          .alert-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-          }
-          .alert-table th, .alert-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-          }
-          .alert-table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-          }
-          .alert-yes {
-            background-color: #ffebee;
-            color: #c62828;
-            font-weight: bold;
-          }
-          .alert-no {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-          }
-        </style>`;
-
+      // Відображаємо текст
+      box.textContent = displayText;
+      box.style.whiteSpace = "pre-line";
       box.style.display = "block";
     })
     .catch(err => {
       const box = document.getElementById("prediction-box");
-      box.innerHTML = "Помилка запиту: " + err;
+      box.textContent = "Помилка запиту: " + err;
       box.style.display = "block";
     });
   });
