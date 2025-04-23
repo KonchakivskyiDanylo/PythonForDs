@@ -4,7 +4,15 @@ import pandas as pd
 import pymongo
 import pickle
 
+
 def load_weather_data():
+    """
+    Loads weather data from a MongoDB collection and converts it into a pandas DataFrame.
+
+    :raises RuntimeError: If there is an issue connecting to MongoDB or retrieving the data.
+    :return: A pandas DataFrame containing the hourly forecast data with associated regions.
+    :rtype: pandas.DataFrame
+    """
     try:
         client = pymongo.MongoClient("mongodb://localhost:27017")
         db = client["PythonForDs"]
@@ -23,20 +31,18 @@ def load_weather_data():
     except Exception as e:
         raise RuntimeError(f"Failed to load weather data: {e}")
 
-# maybe will be useful for frontend
-# def load_alarms_data():
-#     try:
-#         alerts = get_alerts()
-#         if alerts:
-#             return pd.DataFrame(alerts).rename(columns={"location": "region"})
-#     except Exception as e:
-#         print(f"Failed to load alarms data: {e}")
-#
-#     return pd.DataFrame(columns=["region", "alert_type"])
-
 
 def preprocess_data(df: pd.DataFrame, isw_df: pd.DataFrame) -> pd.DataFrame:
-    """Prepares the dataset for prediction."""
+    """
+    Preprocesses and combines weather data with ISW reports.
+
+    :param df:
+        A pandas DataFrame that contains weather data.
+    :param isw_df:
+         A pandas DataFrame containing the TF-IDF vectorized coefficients derived from the latest ISW report.
+    :return:
+        A pandas DataFrame that combines the processed `df` DataFrame with `isw_df`.
+    """
     df["datetime"] = pd.to_datetime(df["datetime"])
     df["hour_preciptype"] = df["hour_preciptype"].fillna("none").astype(str)
     df["hour_preciptype"] = df["hour_preciptype"].apply(
@@ -50,12 +56,14 @@ def preprocess_data(df: pd.DataFrame, isw_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def load_model(path: str):
-    """Loads the pre-trained model from file."""
+    """
+    Loads a model from a file.
+    """
     with open(path, "rb") as f:
         return pickle.load(f)
 
 
-def run_prediction():
+def main():
     # Step 1: Update weather & ISW data
     get_weather.main()
     isw_df = last_isw.main()
@@ -68,7 +76,8 @@ def run_prediction():
     datetime_col = df_processed["datetime"]
     region_col = df_processed["region"]
     X = df_processed.drop(columns=["datetime"])
-    X["region"]="None"
+    X["region"] = "None" #It would be better to retrain the model, but due to the time required, we opted for this approach instead
+
     # Step 4: Predict
     model = load_model("models/RandomForestClassifier_model.pkl")
     predictions = model.predict(X)
@@ -115,6 +124,6 @@ def run_prediction():
 
 if __name__ == "__main__":
     try:
-        run_prediction()
+        main()
     except Exception as e:
         print(f"Error occurred: {e}")

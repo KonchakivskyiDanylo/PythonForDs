@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from flask_cors import CORS
-
+from get_data.alerts import main as get_alerts
 load_dotenv()
 API_TOKEN = os.getenv("API_TOKEN")
 app = Flask(__name__)
@@ -68,5 +68,9 @@ def get_prediction():
         }
         return jsonify(response_data)
 
+@app.route("/alarms", methods=["POST","GET","OPTIONS"])
+def get_active_alarms():
+    alerts=get_alerts()
+    return jsonify(alerts)
 if __name__ == "__main__":
     app.run(debug=True)
