@@ -88,7 +88,6 @@
 </section>
 
 
-<!-- Таблиця годин з тривогами -->
 <div class="container">
     <svg
             height="408.0199"
@@ -470,109 +469,140 @@
                 id="text25">Чернігівська
         </text>
     </svg>
-    <div id="alarm-table-wrapper">
-        <table id="alarm-table">
-            <tbody>
-            <tr>
-                <td>00:00</td>
-                <td>12:00</td>
-            </tr>
-            <tr>
-                <td>01:00</td>
-                <td>13:00</td>
-            </tr>
-            <tr>
-                <td>02:00</td>
-                <td>14:00</td>
-            </tr>
-            <tr>
-                <td>03:00</td>
-                <td>15:00</td>
-            </tr>
-            <tr>
-                <td>04:00</td>
-                <td>16:00</td>
-            </tr>
-            <tr>
-                <td>05:00</td>
-                <td>17:00</td>
-            </tr>
-            <tr>
-                <td>06:00</td>
-                <td>18:00</td>
-            </tr>
-            <tr>
-                <td>07:00</td>
-                <td>19:00</td>
-            </tr>
-            <tr>
-                <td>08:00</td>
-                <td>20:00</td>
-            </tr>
-            <tr>
-                <td>09:00</td>
-                <td>21:00</td>
-            </tr>
-            <tr>
-                <td>10:00</td>
-                <td>22:00</td>
-            </tr>
-            <tr>
-                <td>11:00</td>
-                <td>23:00</td>
-            </tr>
-            </tbody>
-        </table>
+
+</div>
+<div id="alarm-table-wrapper">
+    <table id="alarm-table">
+        <tbody>
+        <tr>
+            <td>00:00</td>
+            <td>12:00</td>
+        </tr>
+        <tr>
+            <td>01:00</td>
+            <td>13:00</td>
+        </tr>
+        <tr>
+            <td>02:00</td>
+            <td>14:00</td>
+        </tr>
+        <tr>
+            <td>03:00</td>
+            <td>15:00</td>
+        </tr>
+        <tr>
+            <td>04:00</td>
+            <td>16:00</td>
+        </tr>
+        <tr>
+            <td>05:00</td>
+            <td>17:00</td>
+        </tr>
+        <tr>
+            <td>06:00</td>
+            <td>18:00</td>
+        </tr>
+        <tr>
+            <td>07:00</td>
+            <td>19:00</td>
+        </tr>
+        <tr>
+            <td>08:00</td>
+            <td>20:00</td>
+        </tr>
+        <tr>
+            <td>09:00</td>
+            <td>21:00</td>
+        </tr>
+        <tr>
+            <td>10:00</td>
+            <td>22:00</td>
+        </tr>
+        <tr>
+            <td>11:00</td>
+            <td>23:00</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<style>
+    #alarm-table-wrapper {
+        position: fixed;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        width: 150px;
+        z-index: 1000;
+    }
+
+    #alarm-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #alarm-table td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+        font-size: 14px;
+        background-color: white;
+        transition: background-color 0.3s ease;
+    }
+
+    #alarm-table td.alarm {
+        background-color: #e63946;
+        color: white;
+        font-weight: bold;
+    }</style>
+
+<div class="alert-legend">
+    <div class="legend-item">
+        <span class="color-box air-alert"></span>
+        <span class="legend-text">Повітряна тривога</span>
+    </div>
+    <div class="legend-item">
+        <span class="color-box no-info"></span>
+        <span class="legend-text">Немає інформації</span>
     </div>
 </div>
-<div class="alert-legend">
-  <div class="legend-item">
-    <span class="color-box air-alert"></span>
-    <span class="legend-text">Повітряна тривога</span>
-  </div>
-  <div class="legend-item">
-    <span class="color-box no-info"></span>
-    <span class="legend-text">Немає інформації</span>
-  </div>
-</div>
 
- <style>
-  .alert-legend {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: white;
-    border-radius: 5px;
-    padding: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
+<style>
+    .alert-legend {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: white;
+        border-radius: 5px;
+        padding: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-  .legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-  }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
 
-  .color-box {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    border-radius: 3px;
-    display: inline-block;
-  }
+    .color-box {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        border-radius: 3px;
+        display: inline-block;
+    }
 
-  .air-alert {
-    background-color: #e63946; /* Red color for air alerts */
-  }
+    .air-alert {
+        background-color: #e63946; /* Red color for air alerts */
+    }
 
-  .no-info {
-    background-color: #D3D3D3; /* Light beige for no information */
-  }
+    .no-info {
+        background-color: #D3D3D3; /* Light beige for no information */
+    }
 
-  .legend-text {
-    font-size: 14px;
-    color: #333;
-  }
+    .legend-text {
+        font-size: 14px;
+        color: #333;
+    }
 </style>
 <style>
     .container {
@@ -621,15 +651,15 @@
         region.addEventListener("click", () => {
             const regionId = region.id || "Невідомо";
 
-            // Перевірка: якщо вже активна — зняти вибір
+
             if (region.classList.contains("active")) {
                 region.classList.remove("active");
                 document.getElementById("info").innerText = `Оберіть область`;
             } else {
-                // Зняти активний стан з усіх інших
+
                 regions.forEach(r => r.classList.remove("active"));
 
-                // Зробити активною цю
+
                 region.classList.add("active");
                 document.getElementById("info").innerText = `Обрана область: ${regionId}`;
             }
@@ -646,10 +676,10 @@
         cells.forEach((cell, index) => {
             let hour;
             if (index % 2 === 0) {
-                // Left column (0-11)
+
                 hour = Math.floor(index / 2);
             } else {
-                // Right column (12-23)
+
                 hour = Math.floor(index / 2) + 12;
             }
 
@@ -666,14 +696,14 @@
         path.addEventListener("click", () => {
             const regionId = path.id;
 
-            // If the region is either "Луганська" or "Автономна Республіка Крим", render a fully red table
+
             if (regionId === "Луганська" || regionId === "Автономна Республіка Крим") {
                 const fullRedTable = Array(24).fill(true);
                 renderAlarmTable(fullRedTable);
-                return;  // Exit early to prevent further fetch and processing
+                return;
             }
 
-            // Only execute the fetch for other regions
+
             const payload = JSON.stringify({
                 token: API_TOKEN,
                 region: regionId
@@ -687,7 +717,7 @@
                 body: payload
             })
                 .then(res => {
-                    // Check if the response is valid JSON
+
                     if (!res.ok) {
                         throw new Error(`Server error: ${res.statusText}`);
                     }
@@ -701,7 +731,7 @@
                         return;
                     }
 
-                    // Prepare hourly data to display in the table
+
                     const hourlyPrediction = Array(24).fill(false);
 
                     regionData.forEach(p => {
@@ -710,7 +740,6 @@
                         hourlyPrediction[hour] = p.prediction === 1;
                     });
 
-                    // Render the alarm table with the updated predictions
                     renderAlarmTable(hourlyPrediction);
                 })
                 .catch(err => {
@@ -731,52 +760,49 @@
         })
             .then(response => response.json())
             .then(data => {
-                const activeAlarms = data;  // assuming data contains an array of regions with active alarms
+                const activeAlarms = data;
                 activeAlarms.forEach(alert => {
-                    const regionPath = document.getElementById(alert); // find the path by id
+                    const regionPath = document.getElementById(alert);
                     if (regionPath) {
-                        regionPath.style.fill = "#e63946";  // change color to red
+                        regionPath.style.fill = "#e63946";
                     }
                 });
             })
             .catch(error => console.error('Error fetching alarms:', error));
     }
 
-    // Call the function to highlight regions when page is loaded
     window.onload = fetchAndHighlightAlarms;
 </script>
+
 <div id="current-time" class="time-display"></div>
 
 <style>
-  .time-display {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
+    .time-display {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
 </style>
 
 <script>
-  function updateClock() {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const seconds = now.getSeconds().toString().padStart(2, '0');
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
 
-    document.getElementById('current-time').textContent = ${hours}:${minutes}:${seconds};
-  }
+        document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
+    }
 
-  // Оновлюємо час кожну секунду
-  setInterval(updateClock, 1000);
-
-  // Викликаємо функцію одразу, щоб не чекати першу секунду
-  updateClock();
+    setInterval(updateClock, 1000);
+    updateClock();
 </script>
 </body>
 </html>
