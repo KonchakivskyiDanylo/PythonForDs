@@ -745,6 +745,7 @@
     // Call the function to highlight regions when page is loaded
     window.onload = fetchAndHighlightAlarms;
 </script>
+
 <div id="current-time" class="time-display"></div>
 
 <style>
@@ -769,7 +770,7 @@
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const seconds = now.getSeconds().toString().padStart(2, '0');
 
-    document.getElementById('current-time').textContent = ${hours}:${minutes}:${seconds};
+    document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
   }
 
   // Оновлюємо час кожну секунду
