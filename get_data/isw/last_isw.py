@@ -2,14 +2,11 @@ import pymongo
 import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
-from dotenv import load_dotenv
 from get_data.isw import html_extractor,isw_data_scraper
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-
-load_dotenv()
 
 ISW_FEATURES = [
     "advanced", "air", "army", "artillery", "authority", "avdiivka", "bakhmut",
@@ -61,6 +58,7 @@ def vectorize_isw_features(text: str, features: list) -> pd.DataFrame:
 def main():
     # Uncomment if you run for the first time
     # nltk.download("punkt")
+    # nltk.download("punkt_tab")
     # nltk.download("stopwords")
     # nltk.download("wordnet")
 
