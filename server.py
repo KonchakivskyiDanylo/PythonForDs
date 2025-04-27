@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from flask_cors import CORS
-from get_data.alerts import main as get_alerts
+from get_data.alerts.get_active_alerts import main as get_alerts
 load_dotenv()
 API_TOKEN = os.getenv("API_TOKEN")
 app = Flask(__name__)

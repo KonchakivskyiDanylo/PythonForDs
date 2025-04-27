@@ -142,7 +142,7 @@ ALERTS_API_TOKEN=your_alerts_api_token # you can apply for API on this website(w
 - Database name: `PythonForDs`
 - Collections: `isw_html`, `isw_report`
 
-You can change the database and collection names if needed
+>You can change the database and collection names if needed
 
 ## Scripts and Their Purposes
 
@@ -425,27 +425,15 @@ python server.py
 For production deployment, the application can be hosted on an AWS EC2 instance. This section provides instructions for setting up the environment and deploying the application.
 
 ## Official Documentation References
-- EC2 Management Console: https://eu-north-1.console.aws.amazon.com/ec2/home?region=eu-north-1#Home
-- Docker installation on AWS EC2: https://linux.how2shout.com/how-to-install-docker-on-aws-ec2-ubuntu-22-04-or-20-04-linux/
-- MongoDB with Docker: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-community-with-docker/
-
-## Two-Step Deployment Process
-
-We've created two deployment scripts that automate the setup process on an AWS EC2 instance:
-
-1. **First script (`setup-jupyter.sh`)** sets up:
-   - Python 3.13.0 with pyenv
-   - Virtual environment
-   - Jupyter Notebook for file uploads
-
-2. **Second script (`deploy-services.sh`)** sets up:
-   - MongoDB via Docker
-   - Scheduled prediction tasks with cron
-   - uWSGI to serve the Flask application
+- EC2 Management Console: [EC2 Console](https://eu-north-1.console.aws.amazon.com/ec2/home?region=eu-north-1#Home)
+- Docker installation on AWS EC2: [Docker on EC2](https://linux.how2shout.com/how-to-install-docker-on-aws-ec2-ubuntu-22-04-or-20-04-linux/)
+- MongoDB with Docker: [MongoDB with Docker](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-community-with-docker/)
 
 ## Deployment Steps
 
-1. **Set up SSH access to your EC2 instance**:
+We've created deployment script(`deployment.sh`) that automate the setup process on an AWS EC2 instance:
+
+### 1. **Set up SSH access to your EC2 instance**:
    ```bash
    # For Linux/Mac users, secure the SSH key permissions
    chmod 400 "path to key"
@@ -453,46 +441,55 @@ We've created two deployment scripts that automate the setup process on an AWS E
    # For Windows users, secure the SSH key permissions
    icacls "path to key" /inheritance:r /grant:r "%USERNAME%":(R)
    
+   # Transfer file to server
+   scp -i /path/to/your-key.pem /path/to/deployment.sh ubuntu@<your-ec2-public-ip>:/home/ubuntu/
+   
    # Connect to your EC2 instance
    ssh -i "path to key" ubuntu@your-ec2-instance-address
    ```
 
-2. **Run the first setup script**:
+### 2. **Run the setup script**:
    ```bash
    # Make the script executable
-   chmod +x setup-jupyter.sh
+   chmod +x deployment.sh
    
    # Run the script
-   ./setup-jupyter.sh
+   ./deployment.sh
    ```
 
-3. **Upload project files via Jupyter Notebook**:
-   - Access Jupyter at `http://YOUR_EC2_IP:8888`
-   - Upload all project files to the directory
+### 3. **Configure Jupyter Notebook**:
+After running the setup script, configure Jupyter Notebook by editing its configuration file. Add the following lines after `c.get_config()` in the `jupyter_notebook_config.py` file:
 
-4. **Run the second setup script**:
-   ```bash
-   # Make the script executable
-   chmod +x deploy-services.sh
-   
-   # Run the script
-   ./deploy-services.sh
-   ```
+```bash
+# After c=get_config()
+c.NotebookApp.ip = '0.0.0.0'  # default value is 'localhost'
+c.NotebookApp.open_browser = False  # default value is True
+c.NotebookApp.password = u'sha1:b33024f36caa:ca337d6d6204ef502d69f8a49a915881c5e47ffa'
+```
 
-5. **Start the application server**:
-   ```bash
-   ./start-server.sh
-   ```
+### 4. **Open Jupyter Notebook and upload your files**:
+```bash
+jupyter notebook
+```
+### 5. **Install Project Dependencies**:
+```bash
+pip install -r requirements.txt
+```
+### 6. **Run Flask Application**:
+To start the Flask application using uWSGI, run the following command:
 
-> **Important Configuration Notes**
->
-> Configure your EC2 security group to allow inbound traffic on:
-> - Port 8000 for the web application 
-> - Port 8888 for Jupyter Notebook
+```bash
+uwsgi --http 0.0.0.0:8000 --wsgi-file server.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191
+```
+
+>**Important Configuration Notes**:
+>- Configure your EC2 security group to allow inbound traffic on the following ports:
+>  - Port **8000** for the web application
+>  - Port **8888** for Jupyter Notebook
 
 ## Acknowledgments
 
 - Institute for the Study of War
 - Visual Crossing Weather API
 - Devs alerts in UA API
-- Andrew Kurochkin
+- Andrew Kurochkin(Lecturer)
