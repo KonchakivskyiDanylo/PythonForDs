@@ -21,8 +21,7 @@ The system combines data from various sources including:
 
 - War events https://air-alarms.in.ua/
 - Institute for the Study of War (ISW) reports https://www.understandingwar.org/
-- Historical weather
-- Weather forecasts https://www.visualcrossing.com/weather-api
+- Historical weather and weather forecasts https://www.visualcrossing.com/weather-api
 - Regional alert systems https://devs.alerts.in.ua/
 
 ## 🔒 **CRITICAL SECURITY NOTICE: `.env` FILE PROTECTION**
@@ -51,8 +50,50 @@ The project consists of several key modules:
 2. **Forecasting Module**: Prepares and executes prediction models
 3. **Frontend UI**: Interaction interface for the backend
 
-3 will be implemented soon
+4. The project follows a modular directory structure:
 
+```
+PythonForDs/
+├── data/                    # Raw datasets
+│   ├── alarms.csv           # Historical air alarm events
+│   ├── regions.csv          # Information about Ukrainian regions
+│   └── weather.csv          # Historical weather data
+├── data_analysis/           # Jupyter notebooks for analysis
+│   ├── alarms_analysis.ipynb
+│   ├── isw_analysis.ipynb
+│   ├── weather_analysis.ipynb
+│   └── merge_datasets.ipynb
+├── prepared_data/           # Processed datasets
+│   ├── alarms_prepared.csv
+│   ├── isw_prepared.csv
+│   ├── weather_prepared.csv
+│   └── final_dataset.csv
+├── get_data/                # Data collection modules
+│   ├── isw/                 # ISW report collection
+│   │   ├── isw_data_scraper.py
+│   │   ├── html_extractor.py
+│   │   └── last_isw.py
+│   ├── weather/             # Weather data collection
+│   │   └── get_weather.py
+│   └── alerts/              # Air alert data collection
+│       └── get_active_alerts.py
+├── models/                  # Trained model files
+│   ├── DecisionTreeClassifier_model.pkl
+│   ├── GaussianNB_model.pkl
+│   └── RandomForestClassifier_model.pkl
+├── templates/               # Frontend templates
+│   ├── index.html           # Main user interface
+│   └── ukraine.svg          # SVG map of Ukraine for visualization
+├── train_models/            # Model training notebooks
+│   ├── model.ipynb
+│   └── final_model.ipynb
+├── .env                     # Environment variables (not committed to git)
+├── .gitignore               # Git ignore file
+├── README.md                # Project documentation
+├── requirements.txt         # Python dependencies
+├── server.py                # Web server implementation
+└── main.py                  # Main prediction engine
+```
 ## **Prerequisites**
 
 ### **System Requirements**
@@ -101,11 +142,13 @@ ALERTS_API_TOKEN=your_alerts_api_token # you can apply for API on this website(w
 - Database name: `PythonForDs`
 - Collections: `isw_html`, `isw_report`
 
-You can change the database and collection names if needed
+>You can change the database and collection names if needed
 
 ## Scripts and Their Purposes
 
-### 1. ISW Data Scraper (`isw_data_scraper.py`)
+### ISW Data Collection (`get_data/isw/`)
+
+#### 1. ISW Data Scraper (`isw_data_scraper.py`)
 
 - Scrapes daily reports from the Institute for the Study of War for a given period of time
 - Saves HTML content to MongoDB
@@ -114,10 +157,10 @@ You can scrape ISW reports for a specific date range from the terminal:
 
 ```bash
 # Basic usage
-python isw_data_scraper.py 2022-02-24 2025-03-01
+python -m get_data.isw.isw_data_scraper 2022-02-24 2025-03-01
 
 # Optional MongoDB customization
-python isw_data_scraper.py 2022-02-24 2025-03-01 --mongo mongodb://localhost:27017/ --database PythonForDs --collection isw_html
+python -m get_data.isw.isw_data_scraper 2022-02-24 2025-03-01 --mongo mongodb://localhost:27017/ --database PythonForDs --collection isw_html
 ```
 
 **Arguments**:
@@ -130,16 +173,16 @@ python isw_data_scraper.py 2022-02-24 2025-03-01 --mongo mongodb://localhost:270
 
 ```bash
 # Run this script to get from the given data until today:
-python isw_data_scraper.py 2022-02-24 
+python -m get_data.isw.isw_data_scraper 2022-02-24 
 
-# To get today's report run this:
-python isw_data_scraper.py 
+# To get yesterday's-today's report run this:
+python -m get_data.isw.isw_data_scraper 
 ```
 
-> **Note:** Downloading the complete dataset from `2022-02-24` to today may take up to **10 minutes**.
-> Please note that some data may be missing for New Year’s, Christmas, and `2022-11-24`.
+> **Note:** Downloading the complete dataset from `2022-02-24` to `2025-03-01` may take up to **10 minutes**.
+> Please note that some data may be missing for New Year's, Christmas, and `2022-11-24`.
 
-### 2. HTML Text Extractor (`html_extractor.py`)
+#### 2. HTML Text Extractor (`html_extractor.py`)
 
 - Parses and extracts text content from all scraped HTML reports in the given database collection
 - Saves processed text to MongoDB
@@ -155,102 +198,68 @@ python isw_data_scraper.py
 
 ```bash
 # Basic usage
-python html_extractor.py
+python -m get_data.isw.html_extractor
 
 # Optional MongoDB customization
-python html_extractor.py --mongo mongodb://localhost:27017/ --database PythonForDs --input-collection isw_html --output-collection isw_report
+python -m get_data.isw.html_extractor --mongo mongodb://localhost:27017/ --database PythonForDs --input-collection isw_html --output-collection isw_report
 ```
 
-### 3. Weather Service API (`get_weather.py`)
+#### 3. Latest ISW Report Processor (`last_isw.py`)
 
-- Flask-based service for getting hourly weather forecasts for Ukrainian regions
+- Retrieves and processes the most recent ISW report
+- Follows the same processing pipeline as historical data:
+  - Scrapes latest report HTML
+  - Extracts text content
+  - Applies TF-IDF vectorization with predefined features
+- Returns processed data ready for prediction
+
+**Usage**:
+
+```bash
+python -m get_data.isw.last_isw
+```
+
+### Weather Data Collection (`get_data/weather/`)
+
+#### 1. Weather Service API (`get_weather.py`)
+
+- Collects hourly weather forecasts for Ukrainian regions
 - Uses Visual Crossing Weather API to fetch detailed weather data
+- Saves the data to MongoDB `weather` collection
 
 **Key Features**:
 
 - Hourly weather data for 24 hours
 - Metrics include:
     - Temperature
-    - Feels like temperature
     - Wind speed and direction
     - Humidity
     - Atmospheric pressure
-    - Precipitation probability
     - Weather conditions
+    - Other
 
-
-- Requires `.env` file with `API_TOKEN` and `VISUAL_CROSSING_API_KEY`
-
-**Usage**:
-
-```bash
-# Run the Flask weather service
-python get_weather.py
-```
-
-Although you can run the Python script directly, it is better to use WSGI server instead
-
-**API Endpoint**:
-
-- Method: POST
-- URL: http://127.0.0.1:5000
-- Endpoint: `/weather`
-- Required JSON payload:
-  ```json
-  {
-    "token": "your_api_token",
-    "oblast": "Kyiv",
-    "requester_name": "Your Name"
-  }
-  ```
-
-We recommend using Postman https://www.postman.com/downloads/
-
-To use it, create postman collection -> add_request -> use text above and click send to get response
-
-### 4. Weather Forecast Aggregator (`weather_forecast.py`)
-
-- Retrieves weather data for Ukrainian oblasts
-- Return forecast data for every Ukrainian oblast for the next 24 hours
+- Requires `.env` file with `VISUAL_CROSSING_API_KEY`
 
 **Usage**:
 
 ```bash
-python weather_forecast.py
+python -m get_data.weather.get_weather
 ```
 
-Make sure that get_weather.py is currently running
+### Alerts Data Collection (`get_data/alerts/`)
 
-### 5. Alerts (`alerts.py`)
+#### 1. Active Alerts Retriever (`get_active_alerts.py`)
 
-- Flask-based service for getting active alerts in Ukraine
-- Uses devs_alerts_in_ua and their python library
-
-- Requires `.env` file with `API_TOKEN` and `ALERTS_API_TOKEN`
+- Fetches active air alerts in Ukrainian regions
+- Uses the official Ukrainian alerts API
+- Returns regions with currently active alerts
+- Requires `.env` file with `ALERTS_API_TOKEN`
 
 **Usage**:
 
 ```bash
-# Run the Flask weather service
-python alerts.py
+python -m get_data.alerts.get_active_alerts
 ```
-
-Although you can just run python script, it is better to use WSGI server instead
-
-**API Endpoint**:
-
-- Method: POST
-- URL: http://127.0.0.1:5001
-- Endpoint: `/alerts`
-- Required JSON payload:
-  ```json
-  {
-    "token": "your_api_token",
-    "requester_name": "Your Name"
-  }
-  ```
-
-You can use it in postman with all the info in the end of 3rd paragraph
 
 ## Data Collection and Analysis Workflow
 
@@ -295,33 +304,192 @@ After analysis, the processed datasets are stored in the `prepared_data` directo
 - `final_dataset.csv` - Combined dataset with optimized features, ready for model training
 
 ## Model Training and Evaluation
-
-### Model Implementation (`model.ipynb`)
-
+### Train Models (`train_models`)
+#### 1. Model Implementation (`model.ipynb`)
 The `model.ipynb` notebook contains the implementation of our prediction models:
+- Implements **Linear Regression** and **Logistic Regression** models
+- Includes preprocessing steps such as **scaling** and **one-hot encoding**
+- Trains and evaluates models using **time series split**
+- Evaluates model performance using various metrics
+- Visualizes model performance and predictions
 
-- Implements Linear Regression and Logistic Regression models
-- Pipeline that includes **scaling**, **one-hot encoding**, and other preprocessing steps.
-- Model training process with time series split to properly evaluate temporal data
-- Performance evaluation using various metrics
-- Visualizations of model performance and predictions
+#### 2. Extended Model Exploration (`final_model.ipynb`)
+The `final_model.ipynb` notebook:
+- Trains **Random Forest**, **Decision Tree**, and **GaussianNB** models
+- Evaluates each model and selects the best-performing one for prediction
+- Saves the trained models as pickle files to the **`model`** directory for production use
+- Displays **confusion matrices** and the **top 20 features** for all models
+- Discusses potential improvements that can be made to enhance model performance
 
-Future work will include implementation of more sophisticated models
 
-## Data Collection Workflow
+## Backend Implementation
 
-1. Run ISW scraper to collect historical reports
-2. Process HTML reports using parser
-3. Obtain weather data and region information from available sources
-4. Request permission for alarm data and obtain it
-5. Run analysis notebooks to process all collected datasets
-6. Train and evaluate prediction models using the final dataset
-7. Collect weather forecasts for real-time predictions
-8. Retrieve active alerts for model validation and real-time use
+#### 1. Main Prediction Engine (`main.py`)
+
+The `main.py` script serves as the central prediction engine, doing the following operations:
+
+- Updates weather data and ISW reports via calls to `get_weather.main()` and `last_isw.main()`
+- Loads and preprocesses the collected data
+- Makes predictions using the trained RandomForest model
+- Organizes predictions by region
+- Stores hourly forecasts in MongoDB for API access
+
+**Usage**:
+```bash
+python main.py
+```
+
+#### 2. Web Server Implementation (`server.py`) 
+
+The `server.py` script implements a Flask-based web server that provides:
+
+- A web interface accessible at the root URL
+- REST API endpoints for retrieving predictions
+- Authentication via API token
+- Cross-Origin Resource Sharing (CORS) support
+
+**API Endpoints**:
+
+1. **Home Page**
+   - **URL**: `/`
+   - **Method**: GET
+   - **Description**: Serves the frontend interface from templates/index.html
+
+2. **Prediction API**
+   - **URL**: `/predict`
+   - **Methods**: POST, GET, OPTIONS
+   - **Authentication**: Requires valid API token
+   - **Parameters**: Optional region name(if not mentioned return for all regions)
+   - **Response**: JSON with hourly predictions for specified region or all regions
+
+3. **Active Alarms API**
+   - **URL**: `/alarms`
+   - **Methods**: POST, GET, OPTIONS
+   - **Description**: Returns currently active air alerts across Ukraine
+
+**Usage**:
+```bash
+python server.py
+```
+
+## Frontend Interface (`/templates/index.html`)
+
+- Interactive map of Ukraine using the `ukraine.svg` file as the base map
+- Real-time visualization of active air alerts across Ukrainian regions
+- Hourly predictions displayed as a timeline for the selected region
+- Color-coded regions to distinguish active alerts (red) from inactive ones (gray)
+- Selection mechanism to focus on specific regions
+- Time indicators for both current and predicted alert statuses
+- Frontend communicates with the Flask backend via REST API endpoints
+
+## Data Processing Pipeline
+
+1. **Initial Data Sources**:
+   - Weather data (provided by lecturer in CSV format)
+   - Air alarm events data (provided by lecturer in CSV format)
+   - Region information data
+
+2. **ISW Report Collection**:
+   - Scrape reports using `isw_data_scraper.py`
+   - Store raw HTML in MongoDB `isw_html` collection
+   - Process HTML with `html_extractor.py` to extract text content
+   - Store processed text in MongoDB `isw_report` collection
+
+3. **Data Analysis and Preparation**:
+   - Process alarms data with `alarms_analysis.ipynb`
+   - Analyze ISW reports with `isw_analysis.ipynb` to create TF-IDF vectors
+   - Process weather data with `weather_analysis.ipynb`
+   - Merge all datasets with `merge_datasets.ipynb`
+   - Store prepared datasets in the `prepared_data` directory
+
+### Model Training and Prediction Pipeline
+
+1. **Model Implementation**:
+   - Train prediction models using `model.ipynb` and `final_model.ipynb`
+   - Implement Linear Regression and Logistic Regression models in `model.ipynb`
+   - Implement Random Forest, Decision Tree and Gaussian NB models in `final_model.ipynb`
+   - Use pipelines with scaling and one-hot encoding
+   - Validate models with time series cross-validation
+   - Save trained model as a pickle file
+
+2. **Real-time Prediction System**:
+   - Collect weather forecasts using `get_weather.py`
+   - Store forecasts in MongoDB `weather` collection
+   - Get latest ISW report using `last_isw.py`
+   - Process report through HTML extraction and TF-IDF vectorization
+   - Merge latest data with the trained model to generate predictions
+   - Store predictions in MongoDB `prediction` collection
+
+# Optional: Server Deployment
+
+For production deployment, the application can be hosted on an AWS EC2 instance. This section provides instructions for setting up the environment and deploying the application.
+
+## Official Documentation References
+- EC2 Management Console: [EC2 Console](https://eu-north-1.console.aws.amazon.com/ec2/home?region=eu-north-1#Home)
+- Docker installation on AWS EC2: [Docker on EC2](https://linux.how2shout.com/how-to-install-docker-on-aws-ec2-ubuntu-22-04-or-20-04-linux/)
+- MongoDB with Docker: [MongoDB with Docker](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-community-with-docker/)
+
+## Deployment Steps
+
+We've created deployment script(`deployment.sh`) that automate the setup process on an AWS EC2 instance:
+
+### 1. **Set up SSH access to your EC2 instance**:
+   ```bash
+   # For Linux/Mac users, secure the SSH key permissions
+   chmod 400 "path to key"
+   
+   # For Windows users, secure the SSH key permissions
+   icacls "path to key" /inheritance:r /grant:r "%USERNAME%":(R)
+   
+   # Transfer file to server
+   scp -i /path/to/your-key.pem /path/to/deployment.sh ubuntu@<your-ec2-public-ip>:/home/ubuntu/
+   
+   # Connect to your EC2 instance
+   ssh -i "path to key" ubuntu@your-ec2-instance-address
+   ```
+
+### 2. **Run the setup script**:
+   ```bash
+   # Make the script executable
+   chmod +x deployment.sh
+   
+   # Run the script
+   ./deployment.sh
+   ```
+
+### 3. **Configure Jupyter Notebook**:
+After running the setup script, configure Jupyter Notebook by editing its configuration file. Add the following lines after `c.get_config()` in the `jupyter_notebook_config.py` file:
+
+```bash
+# After c=get_config()
+c.NotebookApp.ip = '0.0.0.0'  # default value is 'localhost'
+c.NotebookApp.open_browser = False  # default value is True
+c.NotebookApp.password = u'sha1:b33024f36caa:ca337d6d6204ef502d69f8a49a915881c5e47ffa'
+```
+
+### 4. **Open Jupyter Notebook and upload your files**:
+```bash
+jupyter notebook
+```
+### 5. **Install Project Dependencies**:
+```bash
+pip install -r requirements.txt
+```
+### 6. **Run Flask Application**:
+To start the Flask application using uWSGI, run the following command:
+
+```bash
+uwsgi --http 0.0.0.0:8000 --wsgi-file server.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191
+```
+
+>**Important Configuration Notes**:
+>- Configure your EC2 security group to allow inbound traffic on the following ports:
+>  - Port **8000** for the web application
+>  - Port **8888** for Jupyter Notebook
 
 ## Acknowledgments
 
 - Institute for the Study of War
 - Visual Crossing Weather API
 - Devs alerts in UA API
-- Andrew Kurochkin
+- Andrew Kurochkin(Lecturer)
