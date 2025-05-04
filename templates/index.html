@@ -472,6 +472,7 @@
 
 </div>
 <div id="alarm-table-wrapper">
+    <p>Прогноз</p>
     <table id="alarm-table">
         <tbody>
         <tr>
@@ -528,7 +529,7 @@
 <style>
     #alarm-table-wrapper {
         position: fixed;
-        top: 50%;
+        top: 45%;
         right: 0;
         transform: translateY(-50%);
         width: 150px;
@@ -553,8 +554,44 @@
         background-color: #e63946;
         color: white;
         font-weight: bold;
-    }</style>
+    }
 
+    #alarm-table td.next-day {
+        color: #101010;
+        background-color: #807f7f;
+    }
+</style>
+
+<script>
+    // Function to highlight times for the next day in gray
+    function updateTimeDisplay() {
+        // Get current hour
+        const now = new Date();
+        const currentHour = now.getHours();
+
+        // Get all time cells
+        const timeCells = document.querySelectorAll('#alarm-table td');
+
+        timeCells.forEach(cell => {
+            // Extract hour from the cell text (format is "HH:00")
+            const hourText = cell.textContent;
+            const hour = parseInt(hourText.split(':')[0]);
+
+            // If the hour is less than the current hour, it's for the next day
+            if (hour < currentHour) {
+                cell.classList.add('next-day');
+            } else {
+                cell.classList.remove('next-day');
+            }
+        });
+    }
+
+    // Run immediately on page load
+    updateTimeDisplay();
+
+    // Update every minute to keep it current
+    setInterval(updateTimeDisplay, 60000);
+</script>
 <div class="alert-legend">
     <div class="legend-item">
         <span class="color-box air-alert"></span>
@@ -563,6 +600,10 @@
     <div class="legend-item">
         <span class="color-box no-info"></span>
         <span class="legend-text">Немає інформації</span>
+    </div>
+    <div class="legend-item">
+        <span class="color-box next-day1"></span>
+        <span class="legend-text">Наступний день</span>
     </div>
 </div>
 
@@ -599,6 +640,9 @@
         background-color: #D3D3D3; /* Light beige for no information */
     }
 
+    .next-day1 {
+        background-color: #807f7f;
+    }
     .legend-text {
         font-size: 14px;
         color: #333;
