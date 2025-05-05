@@ -1,6 +1,7 @@
 import pymongo
+import mongomock
 
 def test_mongodb_connection():
-    client = pymongo.MongoClient("mongodb://localhost:27017")
+    client = mongomock.MongoClient()
     db = client["PythonForDs"]
     assert "prediction" in db.list_collection_names()

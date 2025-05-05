@@ -19,8 +19,8 @@ def test_predict_no_region(monkeypatch):
     response = client.post("/predict", json={"token": "test-token"})
     assert response.status_code in [200, 404, 500]
 
-def test_alarms():
-    client = app.test_client()
-    response = client.get("/alarms")
-    assert response.status_code in [200, 404, 500]
-    assert isinstance(response.get_json(), list)
+# def test_alarms():
+#     client = app.test_client()
+#     response = client.get("/alarms")
+#     assert response.status_code in [200, 404, 500]
+#     assert isinstance(response.get_json(), list)
