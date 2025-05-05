@@ -74,3 +74,5 @@ def get_active_alarms():
     return jsonify(alerts)
 if __name__ == "__main__":
     app.run(debug=True)
+
+print("")
