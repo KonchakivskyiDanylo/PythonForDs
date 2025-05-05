@@ -2,7 +2,7 @@ import pymongo
 import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
-from get_data.isw import html_extractor,isw_data_scraper
+from get_data.isw import html_extractor, isw_data_scraper
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -54,6 +54,7 @@ def vectorize_isw_features(text: str, features: list) -> pd.DataFrame:
 
     tfidf_matrix = vectorizer.fit_transform([text])
     return pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
+
 
 def main():
     # Uncomment if you run for the first time
