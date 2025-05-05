@@ -7,16 +7,38 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+import pickle
 
-ISW_FEATURES = [
-    "advanced", "air", "army", "artillery", "authority", "avdiivka", "bakhmut",
-    "belarus", "border", "brigade", "command", "confirmed", "district", "division",
-    "drone", "element", "footage", "frontline", "geolocated", "head", "information",
-    "kreminna", "kremlin", "kupyansk", "milblogger", "milbloggers", "missile", "mod",
-    "motorized", "northeast", "noted", "observed", "occupation", "operating", "personnel",
-    "president", "published", "putin", "recently", "regiment", "rifle", "significant",
-    "southeast", "southwest", "state", "unit", "unspecified", "wagner", "within", "would"
-]
+ISW_FEATURES = ['activity belarus', 'advance russian', 'air defense', 'amid continued',
+                'area ukrainian', 'arm army', 'army corp', 'attack near', 'chasiv yar',
+                'city russian', 'claim russian', 'claimed ukrainian', 'combined arm',
+                'confirmation claim', 'confirmed advance', 'continued offensive',
+                'defense minister', 'defense mod', 'direction russian', 'dnipro river',
+                'donetsk city', 'effort russian', 'element russian',
+                'footage published', 'force advanced', 'force also', 'force conducted',
+                'force generation', 'force likely', 'force recently', 'force repelled',
+                'geolocated footage', 'ground attack', 'group force',
+                'indicates russian', 'information operation', 'isw observed',
+                'isw previously', 'kharkiv city', 'kharkiv oblast', 'kherson oblast',
+                'kursk oblast', 'main effort', 'make confirmed', 'milblogger claimed',
+                'milbloggers claimed', 'military command', 'military district',
+                'ministry defense', 'mod claimed', 'motorized rifle',
+                'objective capture', 'oblast border', 'oblast russian',
+                'oblast ukrainian', 'occupation authority', 'offensive operation',
+                'operating near', 'operation near', 'people republic',
+                'president vladimir', 'published indicates', 'rear area',
+                'recently advanced', 'reported ukrainian', 'reportedly operating',
+                'rifle brigade', 'rifle division', 'rifle regiment',
+                'russian authority', 'russian milblogger', 'russian milbloggers',
+                'russian ministry', 'russian mod', 'russian motorized',
+                'russian occupation', 'russian offensive', 'russian official',
+                'russian president', 'russian source', 'russian subordinate',
+                'source claimed', 'source reported', 'southwest donetsk',
+                'staff reported', 'stated russian', 'stated ukrainian',
+                'strike russian', 'supporting effort', 'ukrainian air',
+                'ukrainian general', 'ukrainian official', 'ukrainian strike',
+                'vdv division', 'velyka novosilka', 'vladimir putin', 'wagner group',
+                'war ukraine', 'western zaporizhia', 'zaporizhia oblast']
 
 MONTHS = {
     "january", "february", "march", "april", "may", "june",
@@ -50,9 +72,10 @@ def get_latest_isw_html(db_name: str = "PythonForDs", collection_name: str = "is
 
 
 def vectorize_isw_features(text: str, features: list) -> pd.DataFrame:
-    vectorizer = TfidfVectorizer(vocabulary=features)
+    with open( "models/tfidf_vectorizer.pkl", "rb") as f:
+        vectorizer = pickle.load(f)
 
-    tfidf_matrix = vectorizer.fit_transform([text])
+    tfidf_matrix = vectorizer.transform([text])
     return pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
 
 
