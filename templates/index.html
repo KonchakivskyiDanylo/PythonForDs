@@ -79,8 +79,166 @@
             color: red;
             font-size: 18px;
         }
+                :root {
+        --bg-color: #ffffff;
+        --text-color: #000000;
+        --link-color: #1a0dab;
+        --table-border-color: #dddddd;
+        --table-header-bg: #f1f1f1;
+        --table-row-hover: #f9f9f9;
+        }
+
+        body.dark-mode {
+        --bg-color: #121212;
+        --text-color: #ffffff;
+        --link-color: #8ab4f8;
+        --table-border-color: #333333;
+        --table-header-bg: #1e1e1e;
+        --table-row-hover: #2a2a2a;
+        }
+
+                /* === Статичні стилі для таблиць і рамок === */
+        #alarm-table,
+        #alarm-table th,
+        #alarm-table td,
+        #info {
+        /* колір тексту завжди чорний */
+        color: #000 !important;
+        /* фон — білий */
+        background-color: #fff !important;
+        /* бордери таблиці — світло-сірі */
+        border-color: #dddddd !important;
+        }
+        /* hover-рядки таблиці теж світлі */
+        #alarm-table tr:hover {
+        background-color: #f9f9f9 !important;
+        }
+                /* ========== Статичні стилі для таблички з часом і годинника ========== */
+        /* Годинник у куті */
+        .time-display {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        color: #000              !important;
+        }
+
+        /* Контейнер з прогнозом по годинах */
+        .time-table,
+        .time-slot {
+        background-color: #fff   !important;
+        color: #000              !important;
+        }
+
+        
+        .time-slot span {
+        color: #000              !important;
+        }
+        body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
+        }
+
+        a {
+        color: var(--link-color);
+        }
+
+        #alarm-table {
+        border: 1px solid var(--table-border-color);
+        width: 100%;
+        border-collapse: collapse;
+        }
+
+        #alarm-table th {
+        background-color: var(--table-header-bg);
+        color: var(--text-color);
+        padding: 8px;
+        border: 1px solid var(--table-border-color);
+        }
+
+        #alarm-table td {
+        padding: 8px;
+        border: 1px solid var(--table-border-color);
+        }
+
+        #alarm-table tr:hover {
+        background-color: var(--table-row-hover);
+        }
+
+        /* Стилі для кнопки перемикача */
+        #theme-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: inherit;
+        z-index: 1000;
+        }
+        /* === Пом’якшений фон для статичних блоків у темній темі === */
+        body.dark-mode {
+        /* вибір сірого фону — можна експериментувати з відтінком */
+        --static-bg: #cccccc;
+        /* напівпрозорий варіант для годинника */
+        --static-bg-alpha: rgba(204, 204, 204, 0.8);
+        }
+
+        body.dark-mode #info,
+        body.dark-mode #alert-info-box,
+        body.dark-mode .alert-legend {
+        background-color: var(--static-bg) !important;
+        }
+
+        body.dark-mode #alarm-table td:not(.alarm) {
+        /* для звичайних клітинок таблиці */
+        background-color: var(--static-bg) !important;
+        }
+
+        body.dark-mode .time-display {
+        /* для годинника у куті */
+        background-color: var(--static-bg-alpha) !important;
+        }
+        /* Вирівнювання таблиці з годинами по тому ж правому відступу, що й легенда й годинник */
+        #alarm-table-wrapper {
+        position: fixed !important;      /* фіксуємо від розмітки контейнера */
+        top: 45% !important;             /* ваш поточний vertical-align */
+        right: 20px !important;          /* точно такий самий відступ, як у .alert-legend й .time-display */
+        transform: translateY(-50%) !important;
+        margin-left: 0 !important;       /* прибираємо будь-які margin-left із флекс-контейнера */ 
+        }
     </style>
 </head>
+<script>
+  function annotateTimeSlots() {
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    const slots = document.querySelectorAll('.time-slot');
+    slots.forEach(slot => {
+      const span = slot.querySelector('span');
+      if (!span) return;
+
+      const hourMatch = span.textContent.match(/^(\d{1,2})/);
+      if (!hourMatch) return;
+
+      const slotHour = parseInt(hourMatch[1], 10);
+      const tag = slotHour <= currentHour ? 'next' : 'curr';
+
+      // Уникнути дублювання, якщо вже додано
+      if (!slot.querySelector('.day-tag')) {
+        const label = document.createElement('small');
+        label.textContent = tag;
+        label.className = 'day-tag';
+        label.style.color = '#888';
+        label.style.marginLeft = '10px';
+        label.style.fontSize = '12px';
+        span.appendChild(label);
+      }
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', annotateTimeSlots);
+</script>
 <body>
 <section style="text-align: center">
     <h2>Мапа повітряних тривог</h2>
@@ -229,11 +387,13 @@
                 title="Zhytomyr"/>
         <text
                 fill="#333333"
-                font-size="10px"
+                font-size="11.7658px"
                 text-anchor="middle"
-                x="165.88229"
-                y="150.67191"
-                id="text1">Хмельницька
+                x="212.08855"
+                y="191.034"
+                id="text22"
+                transform="scale(1.032618,0.9684123)"
+                style="stroke-width:0.980489">Вінницька
         </text>
         <text
                 fill="#333333"
@@ -273,13 +433,13 @@
         </text>
         <text
                 fill="#333333"
-                font-size="9.67373px"
+                font-size="8.63607px"
                 text-anchor="middle"
-                x="36.724327"
-                y="204.11919"
+                x="38.663994"
+                y="210.41408"
                 id="text6"
-                transform="scale(0.97635073,1.0242221)"
-                style="stroke-width:0.806144">Закарпатська
+                transform="scale(0.97449816,1.0261692)"
+                style="stroke-width:0.719673">Закарпатська
         </text>
         <text
                 fill="#333333"
@@ -358,19 +518,19 @@
         </text>
         <text
                 fill="#333333"
-                font-size="10.9695px"
+                font-size="10.8612px"
                 text-anchor="middle"
-                x="405.20074"
-                y="287.99835"
-                id="text14"
-                transform="scale(0.95105482,1.0514641)"
-                style="stroke-width:0.914121">Миколаївська
+                x="353.72717"
+                y="246.95531"
+                id="text21"
+                transform="scale(0.94167394,1.0619387)"
+                style="stroke-width:0.905105">Миколаївська
         </text>
         <text
                 fill="#333333"
                 font-size="11.3106px"
                 text-anchor="middle"
-                x="295.70868"
+                x="296.44739"
                 y="264.00323"
                 id="text15"
                 transform="scale(0.94254695,1.0609551)"
@@ -404,13 +564,13 @@
         </text>
         <text
                 fill="#333333"
-                font-size="9.88821px"
+                font-size="6.98751px"
                 text-anchor="middle"
-                x="124.68877"
-                y="147.748"
+                x="120.72814"
+                y="146.92606"
                 id="text19"
-                transform="scale(0.90878342,1.1003722)"
-                style="stroke-width:0.824017">Тернопільська
+                transform="scale(0.93047102,1.0747245)"
+                style="stroke-width:0.557292">Тернопільська
         </text>
         <text
                 fill="#333333"
@@ -422,23 +582,23 @@
         </text>
         <text
                 fill="#333333"
-                font-size="11.8204px"
+                font-size="11.9173px"
                 text-anchor="middle"
-                x="337.79456"
-                y="258.31995"
-                id="text21"
-                transform="scale(0.98503532,1.015192)"
-                style="stroke-width:0.985035">Херсонська
+                x="399.23572"
+                y="293.63013"
+                id="text14"
+                transform="scale(0.97013593,1.0307834)"
+                style="stroke-width:0.993104">Херсонська
         </text>
         <text
                 fill="#333333"
-                font-size="10.8777px"
+                font-size="8.0802px"
                 text-anchor="middle"
-                x="217.22121"
-                y="190.3558"
-                id="text22"
-                transform="scale(1.0023497,0.99765579)"
-                style="stroke-width:0.906477">Вінницька
+                x="165.28673"
+                y="169.14261"
+                id="text1"
+                transform="scale(1.0052994,0.99472854)"
+                style="stroke-width:0.634004">Хмельницька
         </text>
         <text
                 fill="#333333"
@@ -452,13 +612,13 @@
         </text>
         <text
                 fill="#333333"
-                font-size="7.43429px"
+                font-size="6.50503px"
                 text-anchor="middle"
-                x="131.1555"
-                y="215.96368"
+                x="126.36235"
+                y="223.08553"
                 id="text24"
-                transform="scale(0.98823222,1.0119079)"
-                style="stroke-width:0.619525">Чернівецька
+                transform="scale(1.023083,0.97743781)"
+                style="stroke-width:0.542086">Чернівецька
         </text>
         <text
                 fill="#333333"
@@ -556,11 +716,93 @@
         font-weight: bold;
     }
 
-    #alarm-table td.next-day {
-        color: #101010;
-        background-color: #807f7f;
-    }
+   
 </style>
+
+<!-- Інформаційне віконце -->
+<div id="alert-info-box">
+    <p>Хочете отримувати повідомлення про тривоги?</p>
+    <a href="https://uk.wikipedia.org/wiki/%D0%9B%D0%93%D0%91%D0%A2" target="_blank" rel="noopener noreferrer">
+        Телеграм бот
+    </a>
+  </div>
+  
+  <style>
+    #alert-info-box {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      font-family: sans-serif;
+      font-size: 14px;
+      z-index: 1000;
+    }
+  
+    #alert-info-box p {
+      margin: 0 0 8px 0;
+      color: #333;
+    }
+  
+    #alert-info-box a {
+      color: #007BFF;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  
+    #alert-info-box a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  
+
+<script>
+    function updateTimeDisplay() {
+      const now = new Date();
+      const currentHour = now.getHours();
+  
+      const timeCells = document.querySelectorAll('#alarm-table td');
+  
+      timeCells.forEach(cell => {
+        // Видаляємо попередню мітку, якщо вона існує
+        const existingTag = cell.querySelector('.day-tag');
+        if (existingTag) {
+          existingTag.remove();
+        }
+  
+        // Отримуємо текст з клітинки та витягуємо годину
+        const hourText = cell.textContent.trim();
+        const hourMatch = hourText.match(/^(\d{1,2})/);
+        if (!hourMatch) return;
+  
+        const cellHour = parseInt(hourMatch[1], 10);
+        if (isNaN(cellHour)) return;
+  
+        // Визначаємо мітку
+        const label = (cellHour < currentHour) ? 'next' : 'curr';
+  
+        // Створюємо елемент мітки
+        const tag = document.createElement('span');
+        tag.className = 'day-tag';
+        tag.textContent = label;
+        tag.style.display = 'block';
+        tag.style.fontSize = '10px';
+        tag.style.color = '#888';
+        tag.style.marginTop = '2px';
+  
+        // Додаємо мітку до клітинки
+        cell.appendChild(tag);
+      });
+    }
+  
+    // Запуск функції після завантаження сторінки
+    window.addEventListener('DOMContentLoaded', updateTimeDisplay);
+</script>
+  
+  
 
 <script>
     // Function to highlight times for the next day in gray
@@ -600,10 +842,6 @@
     <div class="legend-item">
         <span class="color-box no-info"></span>
         <span class="legend-text">Немає інформації</span>
-    </div>
-    <div class="legend-item">
-        <span class="color-box next-day1"></span>
-        <span class="legend-text">Наступний день</span>
     </div>
 </div>
 
@@ -647,6 +885,11 @@
         font-size: 14px;
         color: #333;
     }
+    /* чорна обведення навколо квадратиків кольору в легенді */
+    .alert-legend .color-box {
+    border: 1px solid #000 !important;
+    }
+
 </style>
 <style>
     .container {
@@ -859,5 +1102,29 @@
     setInterval(updateClock, 1000);
     updateClock();
 </script>
+
+<button id="theme-toggle" aria-label="Змінити тему">🌙</button>
+
+<script>
+    const toggleButton = document.getElementById('theme-toggle');
+    const body = document.body;
+  
+    // Перевірка збереженої теми в localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      body.classList.add(savedTheme);
+      toggleButton.textContent = savedTheme === 'dark-mode' ? '☀️' : '🌙';
+    }
+  
+    // Обробник події для перемикача теми
+    toggleButton.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      const theme = body.classList.contains('dark-mode') ? 'dark-mode' : '';
+      localStorage.setItem('theme', theme);
+      toggleButton.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙';
+    });
+  </script>
+  
+
 </body>
 </html>
