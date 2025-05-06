@@ -531,6 +531,10 @@ The frontend interface provides:
 - Hourly predictions displayed as a timeline
 - Color-coded regions based on alert status
 
+![Light Theme](images/light_theme.png)
+![Dark Theme](images/dark_theme.png)
+![Alarm_Predictor_Registration](images/alarm_predictor_registration.jpg)
+![Alarm_Predictor](images/alarm_predictor.jpg)
 
 ## Acknowledgments
 
