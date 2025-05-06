@@ -84,6 +84,8 @@ The project consists of several key modules:
 
 ```
 PythonForDs/
+├── .github/                 # CI implementation
+│   └── workflows/
 ├── data/                    # Raw datasets
 │   ├── alarms.csv           # Historical air alarm events
 │   ├── regions.csv          # Information about Ukrainian regions
@@ -97,12 +99,14 @@ PythonForDs/
 ├── get_data/                # Data collection modules
 ├── models/                  # Trained model files
 ├── templates/               # Frontend templates
+├── tests/                   # Pytests for CI
 ├── train_models/            # Model training notebooks
 ├── .env                     # Environment variables (not committed to git)
 ├── .gitignore               # Git ignore file
 ├── README.md                # Project documentation
 ├── requirements.txt         # Python dependencies
 ├── server.py                # Web server implementation
+├── tg.py                    # TG Bot implementation
 └── main.py                  # Main prediction engine
 ```
 
@@ -530,6 +534,7 @@ The frontend interface provides:
 - Real-time visualization of active air alerts
 - Hourly predictions displayed as a timeline
 - Color-coded regions based on alert status
+- Link to TG bot to get notifications
 
 ![Light Theme](images/light_theme.png)
 ![Dark Theme](images/dark_theme.png)
